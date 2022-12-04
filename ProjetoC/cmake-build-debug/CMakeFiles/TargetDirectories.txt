@@ -1,0 +1,3 @@
+E:/GitHub/2UFP_Projeto_Arquitetura/ProjetoC/cmake-build-debug/CMakeFiles/ProjetoC.dir
+E:/GitHub/2UFP_Projeto_Arquitetura/ProjetoC/cmake-build-debug/CMakeFiles/edit_cache.dir
+E:/GitHub/2UFP_Projeto_Arquitetura/ProjetoC/cmake-build-debug/CMakeFiles/rebuild_cache.dir
