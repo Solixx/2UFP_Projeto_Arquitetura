@@ -22,10 +22,15 @@ int main() {
     time_t t1;
     srand((unsigned ) time(&t1));
     gerarCarrier(tabuleiro);
-    gerarBattleship(tabuleiro);
-    gerarDestroyer(tabuleiro);
-    gerarSubmarine(tabuleiro);
-    gerarBoat(tabuleiro);
+    gerarCarrier(tabuleiro);
+    gerarCarrier(tabuleiro);
+    gerarCarrier(tabuleiro);
+    gerarCarrier(tabuleiro);
+    gerarCarrier(tabuleiro);
+    //gerarBattleship(tabuleiro);
+    //gerarDestroyer(tabuleiro);
+    //gerarSubmarine(tabuleiro);
+    //gerarBoat(tabuleiro);
 
     displayTabuleiro(tabuleiro);
 
@@ -95,9 +100,9 @@ void gerarCarrier(char tabuleiro[10][10]){
             for (int i = 0; i < size; ++i) {
                 if(tempColuna < 0) tempColuna = 0;
                 if(erro == 0){
-                    if(tabuleiro[linha][coluna-i] == '0' && (coluna-i < 10 && coluna-i >= 0)){ //Esquerda
-                        tabuleiro[linha][coluna-i] = carrier;
-                        if(i != 0) tempColuna--;
+                    if(tabuleiro[linha][tempColuna] == '0' && (coluna-i < 10 && coluna-i >= 0)){ //Esquerda
+                        tabuleiro[linha][tempColuna] = carrier;
+                        tempColuna--;
                         erro = 0;
                     } else if(tabuleiro[linha][tempColuna+i] == '0' && (tempColuna+i < 10 && tempColuna+i >= 0)){
                         tabuleiro[linha][tempColuna+i] = carrier;
@@ -109,9 +114,9 @@ void gerarCarrier(char tabuleiro[10][10]){
                         tempColuna = coluna;
                     }
                 } else{
-                    if(tabuleiro[linha][coluna-i] == 'C'){
-                        tabuleiro[linha][coluna-i] = '0';
-                        if(i != 0) tempColuna--;
+                    if(tabuleiro[linha][tempColuna] == 'C'){
+                        tabuleiro[linha][tempColuna] = '0';
+                        tempColuna--;
                     } else if(tabuleiro[linha][tempColuna+i] == 'C' && (tempColuna+i < 10 && tempColuna+i >= 0)) {
                         tabuleiro[linha][tempColuna + i] = '0';
                     }
