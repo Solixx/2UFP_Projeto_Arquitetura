@@ -89,7 +89,7 @@ add $v0, $a0, $0
 jr $ra
 
 gerarAxRandom:
-li $a1, 1	#valor maximo do numero aleatorio
+li $a1, 2	#valor maximo do numero aleatorio
 li $v0, 42	#gerar numero aleatorio
 syscall
 add $a0, $a0, 0 #valor minimo do numero aleatorio
@@ -121,7 +121,8 @@ All_doWhile_Carrier:
 	cheakFirstPos_doWhile_Carrier:
 		jal gerarNumeroRandom
 		lw $a1, 4($sp)
-		add $t4, $v0, $0
+		#add $t4, $v0, $0
+		addi $t4, $0, 10
 		slti $t0, $t4, 100
 		beq $t0, '0', cheakFirstPos_doWhile_Carrier	#Se $t2 > 100
 		beq $t4, 100, cheakFirstPos_doWhile_Carrier	#Se $t2 == 100
@@ -145,101 +146,101 @@ All_doWhile_Carrier:
 		#slti $t0, $t2, 0
 		#beq $t0, 0, skip_temp_igual_0_Carriet
 		#add $t2, $0, $0
-		bge $t2, $0, test_0_Carriet
+		bge $t2, $0, test_0_Horizontal_Carriet
 		addi $t2, $0, 0
-		j skip_temp_igual_Carriet
+		j skip_temp_igual_Horizontal_Carriet
 		
-		test_0_Carriet:
-		bge $t4, 0, test_0_temp_Carriet
-		j test_10_Carriet
-		test_0_temp_Carriet:
-		bge $t4, 10, test_10_temp_Carriet
-		bge $t2, 0,  skip_temp_igual_Carriet
+		test_0_Horizontal_Carriet:
+		bge $t4, 0, test_0_temp_Horizontal_Carriet
+		j test_10_Horizontal_Carriet
+		test_0_temp_Horizontal_Carriet:
+		bge $t4, 10, test_10_temp_Horizontal_Carriet
+		bge $t2, 0,  skip_temp_igual_Horizontal_Carriet
 		add $t2, $0, $0
-		j test_10_Carriet
+		j test_10_Horizontal_Carriet
 		
-		test_10_Carriet:
-		bge $t4, 10, test_10_temp_Carriet
-		j test_20_Carriet
-		test_10_temp_Carriet:
-		bge $t4, 20, test_20_temp_Carriet
-		bge $t2, 40, skip_temp_igual_Carriet	#Comparar com 40 pois são os bytes de cada linha de 10 digitos
+		test_10_Horizontal_Carriet:
+		bge $t4, 10, test_10_temp_Horizontal_Carriet
+		j test_20_Horizontal_Carriet
+		test_10_temp_Horizontal_Carriet:
+		bge $t4, 20, test_20_temp_Horizontal_Carriet
+		bge $t2, 40, skip_temp_igual_Horizontal_Carriet	#Comparar com 40 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 40
-		j test_20_Carriet
+		j test_20_Horizontal_Carriet
 		
-		test_20_Carriet:
-		bge $t4, 20, test_20_temp_Carriet
-		j test_30_Carriet
-		test_20_temp_Carriet:
-		bge $t4, 30, test_30_temp_Carriet
-		bge $t2, 80,  skip_temp_igual_Carriet		#Comparar com 80 pois são os bytes de cada linha de 10 digitos
+		test_20_Horizontal_Carriet:
+		bge $t4, 20, test_20_temp_Horizontal_Carriet
+		j test_30_Horizontal_Carriet
+		test_20_temp_Horizontal_Carriet:
+		bge $t4, 30, test_30_temp_Horizontal_Carriet
+		bge $t2, 80,  skip_temp_igual_Horizontal_Carriet		#Comparar com 80 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 80
-		j test_30_Carriet
+		j test_30_Horizontal_Carriet
 		
-		test_30_Carriet:
-		bge $t4, 310, test_30_temp_Carriet
-		j test_40_Carriet
-		test_30_temp_Carriet:
-		bge $t4, 40, test_40_temp_Carriet
-		bge $t2, 120,  skip_temp_igual_Carriet	#Comparar com 120 pois são os bytes de cada linha de 10 digitos
+		test_30_Horizontal_Carriet:
+		bge $t4, 310, test_30_temp_Horizontal_Carriet
+		j test_40_Horizontal_Carriet
+		test_30_temp_Horizontal_Carriet:
+		bge $t4, 40, test_40_temp_Horizontal_Carriet
+		bge $t2, 120,  skip_temp_igual_Horizontal_Carriet	#Comparar com 120 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 120
-		j test_40_Carriet
+		j test_40_Horizontal_Carriet
 		
-		test_40_Carriet:
-		bge $t4, 40, test_40_temp_Carriet
-		j test_50_Carriet
-		test_40_temp_Carriet:
-		bge $t4, 50, test_50_temp_Carriet
-		bge $t2, 160, skip_temp_igual_Carriet	#Comparar com 160 pois são os bytes de cada linha de 10 digitos
+		test_40_Horizontal_Carriet:
+		bge $t4, 40, test_40_temp_Horizontal_Carriet
+		j test_50_Horizontal_Carriet
+		test_40_temp_Horizontal_Carriet:
+		bge $t4, 50, test_50_temp_Horizontal_Carriet
+		bge $t2, 160, skip_temp_igual_Horizontal_Carriet	#Comparar com 160 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 160
-		j test_50_Carriet
+		j test_50_Horizontal_Carriet
 		
-		test_50_Carriet:
-		bge $t4, 50, test_50_temp_Carriet
-		j test_60_Carriet
-		test_50_temp_Carriet:
-		bge $t4, 60, test_60_temp_Carriet
-		bge $t2, 200, skip_temp_igual_Carriet		#Comparar com 200 pois são os bytes de cada linha de 10 digitos
+		test_50_Horizontal_Carriet:
+		bge $t4, 50, test_50_temp_Horizontal_Carriet
+		j test_60_Horizontal_Carriet
+		test_50_temp_Horizontal_Carriet:
+		bge $t4, 60, test_60_temp_Horizontal_Carriet
+		bge $t2, 200, skip_temp_igual_Horizontal_Carriet		#Comparar com 200 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 200
-		j test_60_Carriet
+		j test_60_Horizontal_Carriet
 		
-		test_60_Carriet:
-		bge $t4, 60, test_60_temp_Carriet
-		j test_70_Carriet
-		test_60_temp_Carriet:
-		bge $t4, 70, test_70_temp_Carriet
-		bge $t2, 240,  skip_temp_igual_Carriet		#Comparar com 240 pois são os bytes de cada linha de 10 digitos
+		test_60_Horizontal_Carriet:
+		bge $t4, 60, test_60_temp_Horizontal_Carriet
+		j test_70_Horizontal_Carriet
+		test_60_temp_Horizontal_Carriet:
+		bge $t4, 70, test_70_temp_Horizontal_Carriet
+		bge $t2, 240,  skip_temp_igual_Horizontal_Carriet		#Comparar com 240 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 240
-		j test_70_Carriet
+		j test_70_Horizontal_Carriet
 		
-		test_70_Carriet:
-		bge $t4, 70, test_70_temp_Carriet
-		j test_80_Carriet
-		test_70_temp_Carriet:
-		bge $t4, 80, test_80_temp_Carriet
-		bge $t2, 280,  skip_temp_igual_Carriet		#Comparar com 280 pois são os bytes de cada linha de 10 digitos
+		test_70_Horizontal_Carriet:
+		bge $t4, 70, test_70_temp_Horizontal_Carriet
+		j test_80_Horizontal_Carriet
+		test_70_temp_Horizontal_Carriet:
+		bge $t4, 80, test_80_temp_Horizontal_Carriet
+		bge $t2, 280,  skip_temp_igual_Horizontal_Carriet		#Comparar com 280 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 280
-		j test_80_Carriet
+		j test_80_Horizontal_Carriet
 		
-		test_80_Carriet:
-		bge $t4, 80, test_80_temp_Carriet
-		j test_90_Carriet
-		test_80_temp_Carriet:
-		bge $t4, 90, test_90_temp_Carriet
-		bge $t2, 320,  skip_temp_igual_Carriet	#Comparar com 320 pois são os bytes de cada linha de 10 digitos
+		test_80_Horizontal_Carriet:
+		bge $t4, 80, test_80_temp_Horizontal_Carriet
+		j test_90_Horizontal_Carriet
+		test_80_temp_Horizontal_Carriet:
+		bge $t4, 90, test_90_temp_Horizontal_Carriet
+		bge $t2, 320,  skip_temp_igual_Horizontal_Carriet	#Comparar com 320 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 320
-		j test_90_Carriet
+		j test_90_Horizontal_Carriet
 		
-		test_90_Carriet:
-		bge $t4, 90, test_90_temp_Carriet
-		j skip_temp_igual_Carriet
-		test_90_temp_Carriet:
-		bge $t2, 360,  skip_temp_igual_Carriet	#Comparar com 360 pois são os bytes de cada linha de 10 digitos
+		test_90_Horizontal_Carriet:
+		bge $t4, 90, test_90_temp_Horizontal_Carriet
+		j skip_temp_igual_Horizontal_Carriet
+		test_90_temp_Horizontal_Carriet:
+		bge $t2, 360,  skip_temp_igual_Horizontal_Carriet	#Comparar com 360 pois são os bytes de cada linha de 10 digitos
 		addi $t2, $0, 360
-		j skip_temp_igual_Carriet
+		j skip_temp_igual_Horizontal_Carriet
 
-		skip_temp_igual_Carriet:
-		bne $t3, $0, erro_zerar_Carrier		# if(erro != 0)
+		skip_temp_igual_Horizontal_Carriet:
+		bne $t3, $0, erro_zerar_Horizontal_Carrier		# if(erro != 0)
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
@@ -259,9 +260,9 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
-		bne $t6, '0', erro_Pos_Carrier		# if(tabuleiro[linha][coluna-i] != '0')
-		bge $t2, 400, erro_Pos_Carrier		# if(tempColuna >= 400)
-		blt $t2, 0, erro_Pos_Carrier		# if(tempColuna < 0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier		# if(tabuleiro[linha][coluna-i] != '0')
+		bge $t2, 400, erro_Pos_Horizontal_Carrier		# if(tempColuna >= 400)
+		blt $t2, 0, erro_Pos_Horizontal_Carrier		# if(tempColuna < 0)
 		li $t6, 'C'
 		sw $t6, 0($a0)
 		add $t3, $0, $0
@@ -269,7 +270,7 @@ All_doWhile_Carrier:
 		div $t1, $t1, 4
 		j increment_forLoop_Horizontal_Carrier
 		
-		erro_Pos_Carrier:
+		erro_Pos_Horizontal_Carrier:
 		addi $t3, $0, 1
 		add $a1, $0, $t1
 		addi $t1, $0, -1
@@ -277,17 +278,17 @@ All_doWhile_Carrier:
 		j increment_forLoop_Horizontal_Carrier
 		
 		
-		erro_zerar_Carrier:
+		erro_zerar_Horizontal_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
-		bne $t6, 'C', erro_zerar_rightCheck_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
+		bne $t6, 'C', erro_zerar_rightCheck_Horizontal_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
 		add $t6, $0, $0
 		sw $t6, 0($a0)
 		#beq $t1, $0, increment_forLoop_Horizontal_Carrier
 		addi $t2, $t2, -4
 		j checkIigualSize_Horizontal_Carrier
-		erro_zerar_rightCheck_Carrier:
+		erro_zerar_rightCheck_Horizontal_Carrier:
 		add $t2, $t2, 4
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
@@ -312,6 +313,106 @@ All_doWhile_Carrier:
 		addi $t1, $t1, 1
 		j forLoop_Horizontal_Carrier
 	vertical_Carrier:
+	add $t1, $0, $0
+	forLoop_Vertical_Carrier:
+		slt $t0, $t1, $a1
+		beq $t0, 0, checkSaida_All_doWhile_Carrier
+		#slti $t0, $t2, 0
+		#beq $t0, 0, skip_temp_igual_0_Carriet
+		#add $t2, $0, $0
+		
+		test_0_Vertical_Carriet:
+		bge $t2, 0, test_0_temp_Vertical_Carriet
+		blt $t2, 0, transformInPositive_vertical_Carriet
+		j skip_addt2_vertical_Carriet
+		test_0_temp_Vertical_Carriet:
+		bge $t2, 40, skip_addt2_vertical_Carriet
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		lw $t6, 0($a0)
+		beq $t6, '0', skip_addt2_vertical_Carriet
+		addi $t2, $t2, 40
+		j skip_addt2_vertical_Carriet
+		
+		transformInPositive_vertical_Carriet:
+		sub $t4, $t2, $t2
+		sub $t2, $t4, $t2
+		j test_0_Vertical_Carriet
+		
+		skip_addt2_vertical_Carriet:
+		
+		bne $t3, $0, erro_zerar_Vertical_Carrier		# if(erro != 0)
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# if(tabuleiro[linha][coluna-i] != '0')
+		bge $t2, 400, vertical_right_Carriet	# if(tempColuna >= 400)
+		blt $t2, 0, vertical_right_Carriet	# if(tempColuna < 0)
+		li $t6, 'C'
+		sw $t6, 0($a0)
+		add $t3, $0, $0
+		#beq $t1, $0, increment_forLoop_Vertical_Carrier
+		addi $t2, $t2, -40
+		j increment_forLoop_Vertical_Carrier
+		
+		vertical_right_Carriet:
+		mul $t1, $t1, 40
+		add $t2, $t2, $t1
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Vertical_Carrier		# if(tabuleiro[linha][coluna-i] != '0')
+		bge $t2, 400, erro_Pos_Vertical_Carrier		# if(tempColuna >= 400)
+		blt $t2, 0, erro_Pos_Vertical_Carrier		# if(tempColuna < 0)
+		li $t6, 'C'
+		sw $t6, 0($a0)
+		add $t3, $0, $0
+		sub $t2, $t2, $t1
+		div $t1, $t1, 40
+		j increment_forLoop_Vertical_Carrier
+		
+		erro_Pos_Vertical_Carrier:
+		addi $t3, $0, 1
+		add $a1, $0, $t1
+		addi $t1, $0, -1
+		add $t2, $0, $t5
+		j increment_forLoop_Vertical_Carrier
+		
+		
+		erro_zerar_Vertical_Carrier:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		lw $t6, 0($a0)
+		bne $t6, 'C', erro_zerar_rightCheck_Vertical_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
+		add $t6, $0, $0
+		sw $t6, 0($a0)
+		#beq $t1, $0, increment_forLoop_Vertical_Carrier
+		addi $t2, $t2, -40
+		j checkIigualSize_Vertical_Carrier
+		erro_zerar_rightCheck_Vertical_Carrier:
+		add $t2, $t2, 40
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		lw $t6, 0($a0)
+		bne $t6, 'C', increment_forLoop_Vertical_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
+		bge $t2, 400, increment_forLoop_Vertical_Carrier	# if(tempColuna >= 400)
+		blt $t2, 0, increment_forLoop_Vertical_Carrier	# if(tempColuna < 0)
+		add $t6, $0, $0
+		sw $t6, 0($a0)
+		j checkIigualSize_Vertical_Carrier
+		
+		checkIigualSize_Vertical_Carrier:
+		bne $t1, $a1, checkIigualSize_noErrors_Vertical_Carrier
+		j checkSaida_All_doWhile_Carrier
+		
+		checkIigualSize_noErrors_Vertical_Carrier:
+		bne $t1, $a1, increment_forLoop_Vertical_Carrier
+		add $t3, $0, $0
+		j checkSaida_All_doWhile_Carrier
+		
+		increment_forLoop_Vertical_Carrier:
+		addi $t1, $t1, 1
+		j forLoop_Vertical_Carrier
 checkSaida_All_doWhile_Carrier:
 bne $t3, $0, All_doWhile_Carrier
 
