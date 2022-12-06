@@ -21,7 +21,7 @@ jal zerarTabuleiro
 #add $t1, $v0, $0
 addi $s1, $0, 5
 jal gerarCarrier
-jal gerarCarrier
+#jal gerarCarrier
 jal displayTabuleiro
 j exit
 
@@ -40,18 +40,18 @@ add $t3, $0, $0
 add $t1, $0, $0
 add $t3, $a0, $0
 displayTabuleiro_1for:
-	bge $t1, 10, sair_displayTabuleiro_1for		# i >= 40 sai do ciclo
+	bge $t1, 10, sair_displayTabuleiro_1for		# i >= 10 sai do ciclo
 	add $t2, $0, $0
 	displayTabuleiro_2for:
 		bge $t2, 10, sair_displayTabuleiro_2for		# j >= 10 sai do ciclo
 		add $a0, $t3, $0
-		add $a0, $a0, 4
-		add $t3, $a0, $0
+		#add $t3, $a0, $0
 		li $v0, 4
 		lw $t4, 0($t3)
 		sw $t4, valTabuleiro
 		la $a0, valTabuleiro
 		syscall
+		add $t3, $t3, 4
 		addi $t2, $t2, 1
 		j displayTabuleiro_2for
 	sair_displayTabuleiro_2for:
@@ -146,34 +146,34 @@ All_doWhile_Carrier:
 		#beq $t0, 0, skip_temp_igual_0_Carriet
 		#add $t2, $0, $0
 		bge $t2, $0, test_0_Carriet
-		addi $t2, $0, 4
+		addi $t2, $0, 0
 		j skip_temp_igual_Carriet
 		
 		test_0_Carriet:
-		bgt $t4, 0, test_0_temp_Carriet
+		bge $t4, 0, test_0_temp_Carriet
 		j test_10_Carriet
 		test_0_temp_Carriet:
-		bgt $t4, 10, test_10_temp_Carriet
-		bgt $t2, 0,  skip_temp_igual_Carriet
+		bge $t4, 10, test_10_temp_Carriet
+		bge $t2, 0,  skip_temp_igual_Carriet
 		add $t2, $0, $0
 		j test_10_Carriet
 		
 		test_10_Carriet:
-		bgt $t4, 10, test_10_temp_Carriet
+		bge $t4, 10, test_10_temp_Carriet
 		j test_20_Carriet
 		test_10_temp_Carriet:
-		bgt $t4, 20, test_20_temp_Carriet
-		bgt $t2, 40, skip_temp_igual_Carriet	#Comparar com 40 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 44
+		bge $t4, 20, test_20_temp_Carriet
+		bge $t2, 40, skip_temp_igual_Carriet	#Comparar com 40 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 40
 		j test_20_Carriet
 		
 		test_20_Carriet:
-		bgt $t4, 20, test_20_temp_Carriet
+		bge $t4, 20, test_20_temp_Carriet
 		j test_30_Carriet
 		test_20_temp_Carriet:
-		bgt $t4, 30, test_30_temp_Carriet
-		bgt $t2, 80,  skip_temp_igual_Carriet		#Comparar com 80 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 84
+		bge $t4, 30, test_30_temp_Carriet
+		bge $t2, 80,  skip_temp_igual_Carriet		#Comparar com 80 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 80
 		j test_30_Carriet
 		
 		test_30_Carriet:
@@ -182,60 +182,60 @@ All_doWhile_Carrier:
 		test_30_temp_Carriet:
 		bge $t4, 40, test_40_temp_Carriet
 		bge $t2, 120,  skip_temp_igual_Carriet	#Comparar com 120 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 124
+		addi $t2, $0, 120
 		j test_40_Carriet
 		
 		test_40_Carriet:
-		bgt $t4, 40, test_40_temp_Carriet
+		bge $t4, 40, test_40_temp_Carriet
 		j test_50_Carriet
 		test_40_temp_Carriet:
-		bgt $t4, 50, test_50_temp_Carriet
-		bgt $t2, 160, skip_temp_igual_Carriet	#Comparar com 160 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 164
+		bge $t4, 50, test_50_temp_Carriet
+		bge $t2, 160, skip_temp_igual_Carriet	#Comparar com 160 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 160
 		j test_50_Carriet
 		
 		test_50_Carriet:
-		bgt $t4, 50, test_50_temp_Carriet
+		bge $t4, 50, test_50_temp_Carriet
 		j test_60_Carriet
 		test_50_temp_Carriet:
-		bgt $t4, 60, test_60_temp_Carriet
-		bgt $t2, 200, skip_temp_igual_Carriet		#Comparar com 200 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 204
+		bge $t4, 60, test_60_temp_Carriet
+		bge $t2, 200, skip_temp_igual_Carriet		#Comparar com 200 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 200
 		j test_60_Carriet
 		
 		test_60_Carriet:
-		bgt $t4, 60, test_60_temp_Carriet
+		bge $t4, 60, test_60_temp_Carriet
 		j test_70_Carriet
 		test_60_temp_Carriet:
-		bgt $t4, 70, test_70_temp_Carriet
-		bgt $t2, 240,  skip_temp_igual_Carriet		#Comparar com 240 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 244
+		bge $t4, 70, test_70_temp_Carriet
+		bge $t2, 240,  skip_temp_igual_Carriet		#Comparar com 240 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 240
 		j test_70_Carriet
 		
 		test_70_Carriet:
-		bgt $t4, 70, test_70_temp_Carriet
+		bge $t4, 70, test_70_temp_Carriet
 		j test_80_Carriet
 		test_70_temp_Carriet:
-		bgt $t4, 80, test_80_temp_Carriet
-		bgt $t2, 280,  skip_temp_igual_Carriet		#Comparar com 280 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 284
+		bge $t4, 80, test_80_temp_Carriet
+		bge $t2, 280,  skip_temp_igual_Carriet		#Comparar com 280 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 280
 		j test_80_Carriet
 		
 		test_80_Carriet:
-		bgt $t4, 80, test_80_temp_Carriet
+		bge $t4, 80, test_80_temp_Carriet
 		j test_90_Carriet
 		test_80_temp_Carriet:
-		bgt $t4, 90, test_90_temp_Carriet
-		bgt $t2, 320,  skip_temp_igual_Carriet	#Comparar com 320 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 324
+		bge $t4, 90, test_90_temp_Carriet
+		bge $t2, 320,  skip_temp_igual_Carriet	#Comparar com 320 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 320
 		j test_90_Carriet
 		
 		test_90_Carriet:
-		bgt $t4, 90, test_90_temp_Carriet
+		bge $t4, 90, test_90_temp_Carriet
 		j skip_temp_igual_Carriet
 		test_90_temp_Carriet:
-		bgt $t2, 360,  skip_temp_igual_Carriet	#Comparar com 360 pois são os bytes de cada linha de 10 digitos
-		addi $t2, $0, 364
+		bge $t2, 360,  skip_temp_igual_Carriet	#Comparar com 360 pois são os bytes de cada linha de 10 digitos
+		addi $t2, $0, 360
 		j skip_temp_igual_Carriet
 
 		skip_temp_igual_Carriet:
