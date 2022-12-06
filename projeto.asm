@@ -21,6 +21,9 @@ jal zerarTabuleiro
 #add $t1, $v0, $0
 addi $s1, $0, 5
 jal gerarCarrier
+jal displayTabuleiro
+addi $s1, $0, 5
+jal gerarCarrier
 #jal gerarCarrier
 jal displayTabuleiro
 j exit
@@ -121,8 +124,7 @@ All_doWhile_Carrier:
 	cheakFirstPos_doWhile_Carrier:
 		jal gerarNumeroRandom
 		lw $a1, 4($sp)
-		#add $t4, $v0, $0
-		addi $t4, $0, 10
+		add $t4, $v0, $0
 		slti $t0, $t4, 100
 		beq $t0, '0', cheakFirstPos_doWhile_Carrier	#Se $t2 > 100
 		beq $t4, 100, cheakFirstPos_doWhile_Carrier	#Se $t2 == 100
