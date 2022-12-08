@@ -21,9 +21,9 @@ jal zerarTabuleiro
 #add $t1, $v0, $0
 addi $s1, $0, 5
 jal gerarCarrier
-jal displayTabuleiro
+#jal displayTabuleiro
 addi $s1, $0, 5
-jal gerarCarrier
+#jal gerarCarrier
 #jal gerarCarrier
 jal displayTabuleiro
 j exit
@@ -124,7 +124,8 @@ All_doWhile_Carrier:
 	cheakFirstPos_doWhile_Carrier:
 		jal gerarNumeroRandom
 		lw $a1, 4($sp)
-		add $t4, $v0, $0
+		#add $t4, $v0, $0
+		addi $t4, $0, 19
 		slti $t0, $t4, 100
 		beq $t0, '0', cheakFirstPos_doWhile_Carrier	#Se $t2 > 100
 		beq $t4, 100, cheakFirstPos_doWhile_Carrier	#Se $t2 == 100
@@ -337,8 +338,8 @@ All_doWhile_Carrier:
 		j skip_addt2_vertical_Carriet
 		
 		transformInPositive_vertical_Carriet:
-		sub $t4, $t2, $t2
-		sub $t2, $t4, $t2
+		addi $t4, $0, -40
+		sub $t2, $t2, $t4
 		j test_0_Vertical_Carriet
 		
 		skip_addt2_vertical_Carriet:
@@ -358,8 +359,8 @@ All_doWhile_Carrier:
 		j increment_forLoop_Vertical_Carrier
 		
 		vertical_right_Carriet:
-		mul $t1, $t1, 40
-		add $t2, $t2, $t1
+		#mul $t1, $t1, 40
+		addi $t2, $t2, 40
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
@@ -369,8 +370,8 @@ All_doWhile_Carrier:
 		li $t6, 'C'
 		sw $t6, 0($a0)
 		add $t3, $0, $0
-		sub $t2, $t2, $t1
-		div $t1, $t1, 40
+		#sub $t2, $t2, $t1
+		#div $t1, $t1, 40
 		j increment_forLoop_Vertical_Carrier
 		
 		erro_Pos_Vertical_Carrier:

@@ -23,10 +23,6 @@ int main() {
     srand((unsigned ) time(&t1));
     gerarCarrier(tabuleiro);
     gerarCarrier(tabuleiro);
-    gerarCarrier(tabuleiro);
-    gerarCarrier(tabuleiro);
-    gerarCarrier(tabuleiro);
-    gerarCarrier(tabuleiro);
     //gerarBattleship(tabuleiro);
     //gerarDestroyer(tabuleiro);
     //gerarSubmarine(tabuleiro);
