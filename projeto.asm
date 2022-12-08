@@ -21,7 +21,7 @@ jal zerarTabuleiro
 #add $t1, $v0, $0
 addi $s1, $0, 5
 jal gerarCarrier
-jal displayTabuleiro
+#jal displayTabuleiro
 addi $s1, $0, 5
 jal gerarCarrier
 #jal gerarCarrier
