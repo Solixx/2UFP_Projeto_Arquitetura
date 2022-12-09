@@ -23,6 +23,8 @@ int main() {
     srand((unsigned ) time(&t1));
     gerarCarrier(tabuleiro);
     gerarCarrier(tabuleiro);
+    gerarCarrier(tabuleiro);
+    gerarCarrier(tabuleiro);
     //gerarBattleship(tabuleiro);
     //gerarDestroyer(tabuleiro);
     //gerarSubmarine(tabuleiro);
@@ -85,10 +87,10 @@ void gerarCarrier(char tabuleiro[10][10]){
             linha = gerarlinhaAleatorio();
             coluna = gerarColunaAleatorio();
             if(linha >= 10 || coluna >= 10) continue;
-            if(tabuleiro[linha][coluna] == '0'){
+            if(tabuleiro[linha][coluna] == '0' && tabuleiro[linha+1][coluna] == '0' && tabuleiro[linha-1][coluna] == '0' && tabuleiro[linha][coluna+1] == '0' && tabuleiro[linha+1][coluna+1] == '0' && tabuleiro[linha-1][coluna+1] == '0' && tabuleiro[linha][coluna-1] == '0' && tabuleiro[linha+1][coluna-1] == '0' && tabuleiro[linha-1][coluna-1] == '0'){
                 break;
             }
-        } while (tabuleiro[linha][coluna] != 0);
+        } while (tabuleiro[linha][coluna] != '0' || tabuleiro[linha+1][coluna] != '0' || tabuleiro[linha-1][coluna] != '0' || tabuleiro[linha][coluna+1] != '0' || tabuleiro[linha+1][coluna+1] != '0' || tabuleiro[linha-1][coluna+1] != '0' || tabuleiro[linha][coluna-1] != '0' || tabuleiro[linha+1][coluna-1] != '0' || tabuleiro[linha-1][coluna-1] != '0');
         tempColuna = coluna;
         tempLinha = linha;
         int axis = gerarAxisAleatorio();
@@ -96,11 +98,11 @@ void gerarCarrier(char tabuleiro[10][10]){
             for (int i = 0; i < size; ++i) {
                 if(tempColuna < 0) tempColuna = 0;
                 if(erro == 0){
-                    if(tabuleiro[linha][tempColuna] == '0' && (coluna-i < 10 && coluna-i >= 0)){ //Esquerda
+                    if(tabuleiro[linha][tempColuna] == '0' && tabuleiro[linha][tempColuna-1] == '0' && tabuleiro[linha+1][tempColuna] == '0' && tabuleiro[linha-1][tempColuna-1] == '0' && tabuleiro[linha+1][tempColuna-1] == '0' && tabuleiro[linha-1][tempColuna] == '0' && tabuleiro[linha+1][tempColuna+1] == '0' && tabuleiro[linha-1][tempColuna+1] == '0' && (coluna-i < 10 && coluna-i >= 0)){ //Esquerda
                         tabuleiro[linha][tempColuna] = carrier;
                         tempColuna--;
                         erro = 0;
-                    } else if(tabuleiro[linha][tempColuna+i] == '0' && (tempColuna+i < 10 && tempColuna+i >= 0)){
+                    } else if(tabuleiro[linha][tempColuna+i] == '0' && tabuleiro[linha][(tempColuna+i)+1] == '0' && tabuleiro[linha-1][tempColuna+i] == '0' && tabuleiro[linha+1][tempColuna+i] == '0' && tabuleiro[linha+1][(tempColuna+i)-1] == '0' && tabuleiro[linha-1][(tempColuna+i)-1] == '0' && tabuleiro[linha+1][(tempColuna+i)+1] == '0' && tabuleiro[linha-1][(tempColuna+i)+1] == '0' && (tempColuna+i < 10 && tempColuna+i >= 0)){
                         tabuleiro[linha][tempColuna+i] = carrier;
                         erro = 0;
                     } else{
@@ -125,11 +127,11 @@ void gerarCarrier(char tabuleiro[10][10]){
             for (int i = 0; i < 5; ++i) {
                 if(tempLinha < 0) tempLinha = 0;
                 if(erro == 0){
-                    if(tabuleiro[linha-i][coluna] == '0' && (linha-i < 10 && linha-i >= 0)){ //Cima
+                    if(tabuleiro[linha-i][coluna] == '0' && tabuleiro[(linha-i)-1][coluna] == '0' && tabuleiro[(linha-i)-1][coluna+1] == '0' && tabuleiro[(linha-i)-1][coluna-1] == '0' && tabuleiro[linha-i][coluna+1] == '0' && tabuleiro[linha-i][coluna-1] == '0' && tabuleiro[(linha-i)+1][coluna+1] == '0' && tabuleiro[(linha-i)+1][coluna-1] == '0' && (linha-i < 10 && linha-i >= 0)){ //Cima
                         tabuleiro[linha-i][coluna] = carrier;
                         if(i != 0) tempLinha--;
                         erro = 0;
-                    } else if(tabuleiro[tempLinha+i][coluna] == '0' && (tempLinha+i < 10 && tempLinha+i >= 0)){
+                    } else if(tabuleiro[tempLinha+i][coluna] == '0' && tabuleiro[(tempLinha+i)-1][coluna+1] == '0' && tabuleiro[(tempLinha+i)-1][coluna-1] == '0' && tabuleiro[tempLinha+i][coluna+1] == '0' && tabuleiro[tempLinha+i][coluna-1] == '0' && tabuleiro[(tempLinha+i)+1][coluna] == '0' && tabuleiro[(tempLinha+i)+1][coluna+1] == '0' && tabuleiro[(tempLinha+i)+1][coluna-1] == '0' && (tempLinha+i < 10 && tempLinha+i >= 0)){
                         tabuleiro[tempLinha+i][coluna] = carrier;
                         erro = 0;
                     } else{
