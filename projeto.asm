@@ -461,7 +461,7 @@ All_doWhile_Carrier:
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
 		bne $t6, 'C', erro_zerar_rightCheck_Horizontal_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
-		add $t6, $0, $0
+		li $t6, '0'
 		sw $t6, 0($a0)
 		#beq $t1, $0, increment_forLoop_Horizontal_Carrier
 		addi $t2, $t2, -4
@@ -474,7 +474,7 @@ All_doWhile_Carrier:
 		bne $t6, 'C', increment_forLoop_Horizontal_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
 		bge $t2, 400, increment_forLoop_Horizontal_Carrier	# if(tempColuna >= 400)
 		blt $t2, 0, increment_forLoop_Horizontal_Carrier	# if(tempColuna < 0)
-		add $t6, $0, $0
+		li $t6, '0'
 		sw $t6, 0($a0)
 		j checkIigualSize_Horizontal_Carrier
 		
