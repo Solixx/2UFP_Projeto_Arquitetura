@@ -21,6 +21,7 @@ jal zerarTabuleiro
 #add $t1, $v0, $0
 addi $s1, $0, 5
 jal gerarCarrier
+jal gerarCarrier
 #jal displayTabuleiro
 addi $s1, $0, 5
 #jal gerarCarrier
@@ -132,14 +133,14 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha][coluna] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha][coluna] != '0'
 		mul $t5, $t4, 4
 		add $t5, $t5, 40
 		bge $t5, 100, skip_val_1
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha+1][coluna] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha+1][coluna] != '0'
 		skip_val_1:
 		mul $t5, $t4, 4
 		add $t5, $t5, -40
@@ -147,7 +148,7 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha-1][coluna] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha-1][coluna] != '0'
 		skip_zerar_t5_1:
 		mul $t5, $t4, 4
 		add $t5, $t5, 4
@@ -155,7 +156,7 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha][coluna+1] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha][coluna+1] != '0'
 		skip_val_2:
 		mul $t5, $t4, 4
 		add $t5, $t5, 44
@@ -163,7 +164,7 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha+1][coluna+1] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha+1][coluna+1] != '0'
 		skip_val_3:
 		mul $t5, $t4, 4
 		add $t5, $t5, -36
@@ -173,7 +174,7 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha-1][coluna+1] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha-1][coluna+1] != '0'
 		mul $t5, $t4, 4
 		add $t5, $t5, -4
 		blt $t5, 0, skip_zerar_t5_3
@@ -182,14 +183,14 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha][coluna-1] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha][coluna-1] != '0'
 		mul $t5, $t4, 4
 		add $t5, $t5, 36
 		bge $t5, 100, skip_val_4
 		la $a0, tabuleiro
 		add $a0, $a0, $t5
 		lw $t6, 0($a0)
-		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha+1][coluna-1] == '0'
+		bne $t6, '0', cheakFirstPos_doWhile_Carrier		#Validar tabuleiro[linha+1][coluna-1] != '0'
 		skip_val_4:
 		mul $t5, $t4, 4
 		add $t5, $t5, -44
@@ -318,52 +319,52 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, -4
-		blt $a0, 0, skip_val_a0_1
+		blt $a0, 0, skip_val_a0_horLeft_1
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha][tempColuna-1] != '0'
-		skip_val_a0_1:
+		skip_val_a0_horLeft_1:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, 40
-		bge $a0, 100, skip_val_a0_2
+		bge $a0, 100, skip_val_a0_horLeft_2
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha+1][tempColuna] != '0'
-		skip_val_a0_2:
+		skip_val_a0_horLeft_2:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, -44
-		blt $a0, 0, skip_val_a0_3
+		blt $a0, 0, skip_val_a0_horLeft_3
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha-1][tempColuna-1] != '0'
-		skip_val_a0_3:
+		skip_val_a0_horLeft_3:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, 36
-		bge $a0, 100, skip_val_a0_4
+		bge $a0, 100, skip_val_a0_horLeft_4
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha+1][tempColuna-1] != '0'
-		skip_val_a0_4:
+		skip_val_a0_horLeft_4:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, -40
-		blt $a0, 0, skip_val_a0_5
+		blt $a0, 0, skip_val_a0_horLeft_5
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha-1][tempColuna] != '0'
-		skip_val_a0_5:
+		skip_val_a0_horLeft_5:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, 44
-		bge $a0, 100, skip_val_a0_6
+		bge $a0, 100, skip_val_a0_horLeft_6
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha+1][tempColuna+1] != '0'
-		skip_val_a0_6:
+		skip_val_a0_horLeft_6:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		add $a0, $a0, -36
-		blt $a0, 0, skip_val_a0_7
+		blt $a0, 0, skip_val_a0_horLeft_7
 		lw $t6, 0($a0)
 		bne $t6, '0', horizontal_right_Carriet	# tabuleiro[linha-1][tempColuna+1] != '0'
-		skip_val_a0_7:
+		skip_val_a0_horLeft_7:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		bge $t2, 400, horizontal_right_Carriet	# if(tempColuna >= 400)
@@ -381,7 +382,63 @@ All_doWhile_Carrier:
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
-		bne $t6, '0', erro_Pos_Horizontal_Carrier		# if(tabuleiro[linha][coluna-i] != '0')
+		bne $t6, '0', erro_Pos_Horizontal_Carrier		# if(tabuleiro[linha][tempColuna+i] != '0')
+		
+		
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 4
+		bge $a0, 100, skip_val_a0_horRight_1
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha][(tempColuna+i)+1] != '0'
+		skip_val_a0_horRight_1:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 40
+		bge $a0, 100, skip_val_a0_horRight_2
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha+1][tempColuna] != '0'
+		skip_val_a0_horRight_2:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, -44
+		blt $a0, 0, skip_val_a0_horRight_3
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha-1][tempColuna-1] != '0'
+		skip_val_a0_horRight_3:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 36
+		bge $a0, 100, skip_val_a0_horRight_4
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha+1][tempColuna-1] != '0'
+		skip_val_a0_horRight_4:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, -40
+		blt $a0, 0, skip_val_a0_horRight_5
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha-1][tempColuna] != '0'
+		skip_val_a0_horRight_5:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 44
+		bge $a0, 100, skip_val_a0_horRight_6
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha+1][tempColuna+1] != '0'
+		skip_val_a0_horRight_6:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, -36
+		blt $a0, 0, skip_val_a0_horRight_7
+		lw $t6, 0($a0)
+		bne $t6, '0', erro_Pos_Horizontal_Carrier	# tabuleiro[linha-1][tempColuna+1] != '0'
+		skip_val_a0_horRight_7:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		
+		
+		
 		bge $t2, 400, erro_Pos_Horizontal_Carrier		# if(tempColuna >= 400)
 		blt $t2, 0, erro_Pos_Horizontal_Carrier			# if(tempColuna < 0)
 		li $t6, 'C'
@@ -447,7 +504,7 @@ All_doWhile_Carrier:
 		blt $t2, 0, transformInPositive_vertical_Carriet
 		j skip_addt2_vertical_Carriet
 		test_0_temp_Vertical_Carriet:
-		bge $t2, 40, skip_addt2_vertical_Carriet
+		bge $t2, 0, skip_addt2_vertical_Carriet
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
@@ -467,6 +524,58 @@ All_doWhile_Carrier:
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
 		bne $t6, '0', vertical_right_Carriet	# if(tabuleiro[linha][coluna-i] != '0')
+		
+		
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 4
+		bge $a0, 400, skip_val_a0_verUp_1
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha][(tempColuna+i)+1] != '0'
+		skip_val_a0_verUp_1:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		addi $a0, $a0, -4
+		blt $a0, 0, skip_val_a0_verUp_2
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha+1][tempColuna] != '0'
+		skip_val_a0_verUp_2:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, -44
+		blt $a0, 0, skip_val_a0_verUp_3
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha-1][tempColuna-1] != '0'
+		skip_val_a0_verUp_3:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 36
+		bge $a0, 400, skip_val_a0_verUp_4
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha+1][tempColuna-1] != '0'
+		skip_val_a0_verUp_4:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, -40
+		blt $a0, 0, skip_val_a0_verUp_5
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha-1][tempColuna] != '0'
+		skip_val_a0_verUp_5:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, 44
+		bge $a0, 400, skip_val_a0_verUp_6
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha+1][tempColuna+1] != '0'
+		skip_val_a0_verUp_6:
+		la $a0, tabuleiro
+		add $a0, $a0, $t2
+		add $a0, $a0, -36
+		blt $a0, 0, skip_val_a0_verUp_7
+		lw $t6, 0($a0)
+		bne $t6, '0', vertical_right_Carriet	# tabuleiro[linha-1][tempColuna+1] != '0'
+		skip_val_a0_verUp_7:
+		
 		bge $t2, 400, vertical_right_Carriet	# if(tempColuna >= 400)
 		blt $t2, 0, vertical_right_Carriet	# if(tempColuna < 0)
 		li $t6, 'C'
@@ -477,8 +586,8 @@ All_doWhile_Carrier:
 		j increment_forLoop_Vertical_Carrier
 		
 		vertical_right_Carriet:
-		#mul $t1, $t1, 40
-		addi $t2, $t2, 40
+		mul $t1, $t1, 40
+		add $t2, $t2, $t1
 		la $a0, tabuleiro
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
@@ -488,8 +597,8 @@ All_doWhile_Carrier:
 		li $t6, 'C'
 		sw $t6, 0($a0)
 		add $t3, $0, $0
-		#sub $t2, $t2, $t1
-		#div $t1, $t1, 40
+		sub $t2, $t2, $t1
+		div $t1, $t1, 40
 		j increment_forLoop_Vertical_Carrier
 		
 		erro_Pos_Vertical_Carrier:
@@ -505,7 +614,7 @@ All_doWhile_Carrier:
 		add $a0, $a0, $t2
 		lw $t6, 0($a0)
 		bne $t6, 'C', erro_zerar_rightCheck_Vertical_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
-		add $t6, $0, $0
+		li $t6, '0'
 		sw $t6, 0($a0)
 		#beq $t1, $0, increment_forLoop_Vertical_Carrier
 		addi $t2, $t2, -40
@@ -518,7 +627,7 @@ All_doWhile_Carrier:
 		bne $t6, 'C', increment_forLoop_Vertical_Carrier	# if(tabuleiro[linha][coluna-i] != 'C')
 		bge $t2, 400, increment_forLoop_Vertical_Carrier	# if(tempColuna >= 400)
 		blt $t2, 0, increment_forLoop_Vertical_Carrier	# if(tempColuna < 0)
-		add $t6, $0, $0
+		li $t6, '0'
 		sw $t6, 0($a0)
 		j checkIigualSize_Vertical_Carrier
 		
