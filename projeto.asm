@@ -75,20 +75,20 @@ add $a0, $t1, $0	# Guardar o Size do Barco em $a0
 add $a1, $t2, $0	# Guardar a Letra do Barco em $a1
 sw $a0, 4($sp)		# Guardo o Size do Barco na stack pq vou perder o valor de $a0 noutras funções
 sw $a1, 8($sp)		# Guardo a Letra do Barco na stack pq vou perder o valor de $a1 noutras funções
-add $t1, $0, $0
-add $t2, $0, $0
-add $t3, $0, $0
-add $t4, $0, $0
-add $t5, $0, $0
-add $t6, $0, $0
-add $t7, $0, $0
 la $s0, tabuleiro	# Guardar o endereço do tabuleiro em $s0
 la $s1, arrayDePos	# Guardar o endereço do arrayDePos em $s1
 #TODO
 gerarPos:
+	add $t1, $0, $0
+	add $t2, $0, $0
+	add $t3, $0, $0
+	add $t4, $0, $0
+	add $t5, $0, $0
+	add $t6, $0, $0
+	add $t7, $0, $0
 	jal gerarAxRandom		# Função que gera Numero entre 0 < 2
 	add $t3, $v0, $0		# Guarda o valor que vai ser usado para saber em que direção adicionar as peças do barco
-	addi $t3, $0, 0
+	#addi $t3, $0, 0
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 	beq $t3, 0, validacoesHor
 	validacoesVert:
@@ -98,7 +98,7 @@ gerarPos:
 		sub $t4, $t4, $t5		# 100 - ((Size do barco-1) * 10) / Usado para saber o limite do numero gerado na função gerarNumeroRandomVert (tabuleiro sem ser multiplicado por 4 / 0-100)
 		jal gerarNumeroRandomVert	# Função que gera Numero entre 0 < 60
 		add $t1, $v0, $0		# Guarda a primeira posiçãop gerada pela função "gerarNumeroRandom"
-		addi $t1, $0, 0
+		#addi $t1, $0, 0
 		
 		jal validarCima		# Chama função que vai validar se vou precisar validar a linha de cima
 		add $t6, $v0, $0		# recebe o valor da função
@@ -117,7 +117,7 @@ gerarPos:
 	validacoesHor:
 		jal gerarNumeroRandom		# Função que gera Numero entre 0 < 100
 		add $t1, $v0, $0		# Guarda a primeira posiçãop gerada pela função "gerarNumeroRandom"
-		addi $t1, $0, 0
+		#addi $t1, $0, 0
 		mul $t1, $t1, 4			# Multiplicar essa posição para ser usada nos arrays
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 		mul $t5, $a0, 4			# Size do barco * 4
@@ -268,6 +268,56 @@ gerarPos:
 			addi $s0, $s0, 40		# Ando para baixo no tabuleiro
 			sw $t1, 0($s1)			# Guarda o valor de $t1 em $s1(array com as posições onde vão ser inseridas as letras do barco no tabuleiro)
 			addi $t1, $t1, 40		# $t1 + 40 para andar para baixo no tabuleiro (várias peças do barco)
+			
+			jal validarBaixo
+			add $t6, $v0, $0
+			lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+			
+			validacoesPosicoesVert:
+			lw $t4, 0($s0)			# Recebe o valor do tabuleiro
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste1			# else salta para o prox teste
+			vertTeste1:
+			beq $t6, 1, vertTeste2		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			beq $t7, 2, vertTeste2		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, -36($s0)		# recebe o valor da diagonal cima à direita de cima do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste2			# else salta para o prox teste
+			vertTeste2:
+			beq $t7, 2, vertTeste3		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, 4($s0)			# recebe o valor da direita do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste3			# else salta para o prox teste
+			vertTeste3:
+			beq $t6, 2, vertTeste4		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+			beq $t7, 2, vertTeste4		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, 44($s0)			# recebe o valor da diagonal baixo à direita do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste4			# else salta para o prox teste
+			vertTeste4:
+			beq $t6, 2, vertTeste5		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+			lw $t4, 40($s0)			# recebe o valor da linha de baixo do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste5			# else salta para o prox teste
+			vertTeste5:
+			beq $t6, 2, vertTeste6		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+			beq $t7, 1, vertTeste6		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			lw $t4, 36($s0)			# recebe o valor da diagonal baixo à esquerda do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste6			# else salta para o prox teste
+			vertTeste6:
+			beq $t7, 1, vertTeste7		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, -4($s0)			# recebe o valor da esquerda do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j vertTeste7			# else salta para o prox teste
+			vertTeste7:
+			beq $t6, 1, sairTesteVert	# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			beq $t7, 1, sairTesteVert	# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			lw $t4, -44($s0)		# recebe o valor da diagonal de cima à esquerda do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j sairTesteVert			# else salta para o prox teste
+			
+			sairTesteVert:
 			j sairDeAxis
 		fazHorizontal:
 			addi $s0, $s0, 4		# Ando para a direita no tabuleiro
