@@ -33,6 +33,18 @@ jal zerarTabuleiro
 addi $t1, $0, 5
 li $t2, 'C'
 jal gerarTabuleiro
+addi $t1, $0, 4
+li $t2, 'B'
+jal gerarTabuleiro
+addi $t1, $0, 3
+li $t2, 'D'
+jal gerarTabuleiro
+addi $t1, $0, 3
+li $t2, 'S'
+jal gerarTabuleiro
+addi $t1, $0, 2
+li $t2, 'P'
+jal gerarTabuleiro
 jal displayTabuleiro
 #TODO
 
@@ -51,7 +63,7 @@ gerarTabuleiro:
 # $t1 -> posição do barco antes de chackar se vazia / posição do barco para add Letra
 # $t2 -> Valor na Pos do tabuleiro
 # $t3 -> Axis (Horizontal = 0 / Vertical = 1)
-# $t4 ->
+# $t4 -> valor para validações como numero max etc.. / recebe o valor de uma posição do tabuleiro para teste de posições com '0'
 # $t5 -> size Barco *4
 # $t9 -> I
 
@@ -61,13 +73,17 @@ add $a0, $t1, $0	# Guardar o Size do Barco em $a0
 add $a1, $t2, $0	# Guardar a Letra do Barco em $a1
 sw $a0, 4($sp)		# Guardo o Size do Barco na stack pq vou perder o valor de $a0 noutras funções
 sw $a1, 8($sp)		# Guardo a Letra do Barco na stack pq vou perder o valor de $a1 noutras funções
+add $t1, $0, $0
+add $t2, $0, $0
+add $t3, $0, $0
+add $t4, $0, $0
+add $t5, $0, $0
 la $s0, tabuleiro	# Guardar o endereço do tabuleiro em $s0
 la $s1, arrayDePos	# Guardar o endereço do arrayDePos em $s1
 #TODO
 gerarPos:
 	jal gerarAxRandom		# Função que gera Numero entre 0 < 2
 	add $t3, $v0, $0		# Guarda o valor que vai ser usado para saber em que direção adicionar as peças do barco
-	addi $t3, $0, 1
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 	beq $t3, 0, validacoesHor
 	validacoesVert:
@@ -78,12 +94,13 @@ gerarPos:
 		jal gerarNumeroRandomVert	# Função que gera Numero entre 0 < 60
 		add $t1, $v0, $0		# Guarda a primeira posiçãop gerada pela função "gerarNumeroRandom"
 		mul $t1, $t1, 4			# Multiplicar essa posição para ser usada nos arrays
+		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 	j sair_validacoes
 	validacoesHor:
 		jal gerarNumeroRandom		# Função que gera Numero entre 0 < 100
 		add $t1, $v0, $0		# Guarda a primeira posiçãop gerada pela função "gerarNumeroRandom"
 		mul $t1, $t1, 4			# Multiplicar essa posição para ser usada nos arrays
-		
+		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 		mul $t5, $a0, 4
 		Hor_t1_entre_0_36:
 		bge $t1, 40, Hor_t1_entre_40_76
@@ -159,6 +176,45 @@ gerarPos:
 	la $s0, tabuleiro		# Voltar a meter o valor do endereço do tabuleiro em $a0 pois foi perdido na função anterior "gerarNumeroRandom"
 	add $s0, $s0, $t1		# Meter $s0 na posição gerada aleatóriamente
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+	
+	lw $t4, 0($s0)
+	bne $t4, '0', teste0
+	j sairTeste
+	teste0: bne $t4, 0, gerarPos
+	lw $t4, -40($s0)
+	bne $t4, '0', teste1
+	j sairTeste
+	teste1: bne $t4, 0, gerarPos
+	lw $t4, -36($s0)
+	bne $t4, '0', teste2
+	j sairTeste
+	teste2: bne $t4, 0, gerarPos
+	lw $t4, 4($s0)
+	bne $t4, '0', teste3
+	j sairTeste
+	teste3: bne $t4, 0, gerarPos
+	lw $t4, 44($s0)
+	bne $t4, '0', teste4
+	j sairTeste
+	teste4: bne $t4, 0, gerarPos
+	lw $t4, 40($s0)
+	bne $t4, '0', teste5
+	j sairTeste
+	teste5: bne $t4, 0, gerarPos
+	lw $t4, 36($s0)
+	bne $t4, '0', teste6
+	j sairTeste
+	teste6: bne $t4, 0, gerarPos
+	lw $t4, -4($s0)
+	bne $t4, '0', teste7
+	j sairTeste
+	teste7: bne $t4, 0, gerarPos
+	lw $t4, -44($s0)
+	bne $t4, '0', teste8
+	j sairTeste
+	teste8: bne $t4, 0, gerarPos
+	
+	sairTeste:
 	addi $t9, $0, 0			# i = 0
 	forSizeBarco:
 		beq $t9, $a0, breakForSizeBarco	# If(I < Size) SAI -> breakForSizeBarco
