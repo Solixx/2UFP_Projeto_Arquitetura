@@ -65,6 +65,8 @@ gerarTabuleiro:
 # $t3 -> Axis (Horizontal = 0 / Vertical = 1)
 # $t4 -> valor para validações como numero max etc.. / recebe o valor de uma posição do tabuleiro para teste de posições com '0'
 # $t5 -> size Barco *4
+# $t6 -> Saber se vou validar cima/baixo 	(0 -> validar ambas / 1 -> nao validar cima / 2 -> não validar baixo)
+# $t7 -> Saber se vou validar esquerda/direita 	(0 -> validar / 1 -> nao validar esquerda / 2 -> não validar direita)
 # $t9 -> I
 
 add $sp, $sp, -12	# Baixar a Stack
@@ -78,141 +80,182 @@ add $t2, $0, $0
 add $t3, $0, $0
 add $t4, $0, $0
 add $t5, $0, $0
+add $t6, $0, $0
+add $t7, $0, $0
 la $s0, tabuleiro	# Guardar o endereço do tabuleiro em $s0
 la $s1, arrayDePos	# Guardar o endereço do arrayDePos em $s1
 #TODO
 gerarPos:
 	jal gerarAxRandom		# Função que gera Numero entre 0 < 2
 	add $t3, $v0, $0		# Guarda o valor que vai ser usado para saber em que direção adicionar as peças do barco
+	addi $t3, $0, 0
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 	beq $t3, 0, validacoesHor
 	validacoesVert:
-		addi $t4, $0, 100
-		add $t5, $a0, -1
-		mul $t5, $t5, 10
-		sub $t4, $t4, $t5
+		addi $t4, $0, 100		# Igualo $t4 = 100 (valor maximo do tabuleiro sem ser multiplicado por 4 / 0-100)
+		add $t5, $a0, -1		# Size do barco -1
+		mul $t5, $t5, 10		# (Size do barco-1) * 10
+		sub $t4, $t4, $t5		# 100 - ((Size do barco-1) * 10) / Usado para saber o limite do numero gerado na função gerarNumeroRandomVert (tabuleiro sem ser multiplicado por 4 / 0-100)
 		jal gerarNumeroRandomVert	# Função que gera Numero entre 0 < 60
 		add $t1, $v0, $0		# Guarda a primeira posiçãop gerada pela função "gerarNumeroRandom"
+		addi $t1, $0, 0
+		
+		jal validarCima		# Chama função que vai validar se vou precisar validar a linha de cima
+		add $t6, $v0, $0		# recebe o valor da função
+		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+		j sairValidarCimaBaixo		# se $t6 = 1 então estou na primeira linha e não preciso de fazer "validarLinhaBaixo"
+		
+		jal validarBaixo
+		add $t6, $v0, $0
+		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+		
+		sairValidarCimaBaixo:
 		mul $t1, $t1, 4			# Multiplicar essa posição para ser usada nos arrays
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+		
 	j sair_validacoes
 	validacoesHor:
 		jal gerarNumeroRandom		# Função que gera Numero entre 0 < 100
 		add $t1, $v0, $0		# Guarda a primeira posiçãop gerada pela função "gerarNumeroRandom"
+		addi $t1, $0, 0
 		mul $t1, $t1, 4			# Multiplicar essa posição para ser usada nos arrays
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
-		mul $t5, $a0, 4
-		Hor_t1_entre_0_36:
-		bge $t1, 40, Hor_t1_entre_40_76
-			addi $t4, $0, 40
-			sub $t4, $t4, $t5
-			ble $t1, $t4, sair_validacoes
-			add $t1, $0, $t4
-			j sair_validacoes
-		Hor_t1_entre_40_76:
+		mul $t5, $a0, 4			# Size do barco * 4
+		Hor_t1_entre_0_36:		# Testes na primeira linha
+		bge $t1, 40, Hor_t1_entre_40_76		# if($t1 >= 40) vai para o teste da 2ª linha
+			addi $t4, $0, 40		# $t4 = 40 ultima celula/coluna da linha
+			sub $t4, $t4, $t5		# 40- (size do barco * 4) = à linha que ele pode ser colocado e não passar o limite da linha (ex: 36 passa a 20 num barco de size 5 assim vai do meio da linha até ao fim nem ultrapassar)
+			addi $t6, $0, 1			# Igual $t6 a 1 para saber que não vou validar a linha de cima (pois não existe)
+			ble $t1, $t4, sair_validacoes	# se a posição que o barco vai ser colocado for maior que 40 - (size do barco * 4) ent mete o barco em $t4 (ex: 36 passa a 20 num barco de size 5 assim vai do meio da linha até ao fim nem ultrapassar)
+			add $t1, $0, $t4		# iguala $t1 a $t4
+			j sair_validacoes		# sair das validações
+		Hor_t1_entre_40_76:			# Mesma coisa da de cima mas para a 2ª linha
 		bge $t1, 80, Hor_t1_entre_80_116
 			addi $t4, $0, 80
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_80_116:
+		Hor_t1_entre_80_116:			# Mesma coisa da de cima mas para a 3ª linha
 		bge $t1, 120, Hor_t1_entre_120_156
 			addi $t4, $0, 120
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_120_156:
+		Hor_t1_entre_120_156:			# Mesma coisa da de cima mas para a 4ª linha
 		bge $t1, 160, Hor_t1_entre_160_196
 			addi $t4, $0, 160
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_160_196:
+		Hor_t1_entre_160_196:			# Mesma coisa da de cima mas para a 5ª linha
 		bge $t1, 200, Hor_t1_entre_200_236
 			addi $t4, $0, 200
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
-			j sair_validacoes
-		Hor_t1_entre_200_236:
+			j sair_validacoes	
+		Hor_t1_entre_200_236:			# Mesma coisa da de cima mas para a 6ª linha
 		bge $t1, 240, Hor_t1_entre_240_276
 			addi $t4, $0, 240
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_240_276:
+		Hor_t1_entre_240_276:			# Mesma coisa da de cima mas para a 7ª linha
 		bge $t1, 280, Hor_t1_entre_280_316
 			addi $t4, $0, 280
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_280_316:
+		Hor_t1_entre_280_316:			# Mesma coisa da de cima mas para a 8ª linha
 		bge $t1, 320, Hor_t1_entre_320_356
 			addi $t4, $0, 320
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_320_356:
+		Hor_t1_entre_320_356:			# Mesma coisa da de cima mas para a 9ª linha
 		bge $t1, 360, Hor_t1_entre_360_396
 			addi $t4, $0, 360
 			sub $t4, $t4, $t5
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
-		Hor_t1_entre_360_396:
+		Hor_t1_entre_360_396:			# Mesma coisa da de cima mas para a 10ª linha
 		bge $t1, 400, sair_validacoes
 			addi $t4, $0, 400
 			sub $t4, $t4, $t5
+			addi $t6, $0, 2			# Igual $t6 a 2 para saber que não vou validar a linha de baixo (pois não existe)
 			ble $t1, $t4, sair_validacoes
 			add $t1, $0, $t4
 			j sair_validacoes
+			
 	sair_validacoes:
 	la $s0, tabuleiro		# Voltar a meter o valor do endereço do tabuleiro em $a0 pois foi perdido na função anterior "gerarNumeroRandom"
 	add $s0, $s0, $t1		# Meter $s0 na posição gerada aleatóriamente
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
 	
-	lw $t4, 0($s0)
-	bne $t4, '0', teste0
-	j sairTeste
-	teste0: bne $t4, 0, gerarPos
-	lw $t4, -40($s0)
-	bne $t4, '0', teste1
-	j sairTeste
-	teste1: bne $t4, 0, gerarPos
-	lw $t4, -36($s0)
-	bne $t4, '0', teste2
-	j sairTeste
-	teste2: bne $t4, 0, gerarPos
-	lw $t4, 4($s0)
-	bne $t4, '0', teste3
-	j sairTeste
-	teste3: bne $t4, 0, gerarPos
-	lw $t4, 44($s0)
-	bne $t4, '0', teste4
-	j sairTeste
-	teste4: bne $t4, 0, gerarPos
-	lw $t4, 40($s0)
-	bne $t4, '0', teste5
-	j sairTeste
-	teste5: bne $t4, 0, gerarPos
-	lw $t4, 36($s0)
-	bne $t4, '0', teste6
-	j sairTeste
-	teste6: bne $t4, 0, gerarPos
-	lw $t4, -4($s0)
-	bne $t4, '0', teste7
-	j sairTeste
-	teste7: bne $t4, 0, gerarPos
-	lw $t4, -44($s0)
-	bne $t4, '0', teste8
-	j sairTeste
-	teste8: bne $t4, 0, gerarPos
+	jal validacoesEsquerda		# chama a função que valida se vou ter de validar o lado esquerdo da posição
+	add $t7, $v0, $0
+	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+	beq $t7, 1, validacoesPosicoes	# Se $t7 = 1 quer dizer q n vou validar à esquerda ent não preciso de ver a "validacoesDireita"
+	
+	jal validacoesDireita		# chama a função que valida se vou ter de validar o lado esquerdo da posição
+	add $t7, $v0, $0
+	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+	
+	validacoesPosicoes:
+	lw $t4, 0($s0)			# Recebe o valor do tabuleiro
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste1			# else salta para o prox teste
+	mainTeste1:
+	beq $t6, 1, mainTeste2		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+	lw $t4, -40($s0)		# recebe o valor da linha de cima do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste2			# else salta para o prox teste
+	mainTeste2:
+	beq $t6, 1, mainTeste3		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+	beq $t7, 2, mainTeste3		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+	lw $t4, -36($s0)		# recebe o valor da diagonal cima à direita de cima do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste3			# else salta para o prox teste
+	mainTeste3:
+	beq $t7, 2, mainTeste4		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+	lw $t4, 4($s0)			# recebe o valor da direita do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste4			# else salta para o prox teste
+	mainTeste4:
+	beq $t6, 2, mainTeste5		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+	beq $t7, 2, mainTeste5		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+	lw $t4, 44($s0)			# recebe o valor da diagonal baixo à direita do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste5			# else salta para o prox teste
+	mainTeste5:
+	beq $t6, 2, mainTeste6		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+	lw $t4, 40($s0)			# recebe o valor da linha de baixo do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste6			# else salta para o prox teste
+	mainTeste6:
+	beq $t6, 2, mainTeste7		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+	beq $t7, 1, mainTeste7		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+	lw $t4, 36($s0)			# recebe o valor da diagonal baixo à esquerda do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste7			# else salta para o prox teste
+	mainTeste7:
+	beq $t7, 1, mainTeste8		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+	lw $t4, -4($s0)			# recebe o valor da esquerda do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j mainTeste8			# else salta para o prox teste
+	mainTeste8:
+	beq $t6, 1, sairTeste		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+	beq $t7, 1, sairTeste		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+	lw $t4, -44($s0)		# recebe o valor da diagonal de cima à esquerda do tabulerio
+	bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+	j sairTeste			# else salta para o prox teste
 	
 	sairTeste:
 	addi $t9, $0, 0			# i = 0
@@ -230,6 +273,56 @@ gerarPos:
 			addi $s0, $s0, 4		# Ando para a direita no tabuleiro
 			sw $t1, 0($s1)			# Guarda o valor de $t1 em $s1(array com as posições onde vão ser inseridas as letras do barco no tabuleiro)
 			addi $t1, $t1, 4		# $t1 + 4 para andar para a direita no tabuleiro (várias peças do barco)
+			
+			jal validacoesDireita		# chama a função que valida se vou ter de validar o lado esquerdo da posição
+			add $t7, $v0, $0
+			lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras funções)
+			
+			validacoesPosicoesHor:
+			lw $t4, 0($s0)			# Recebe o valor do tabuleiro
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste1			# else salta para o prox teste
+			horTeste1:
+			beq $t6, 1, horTeste2		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			lw $t4, -40($s0)		# recebe o valor da linha de cima do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste2			# else salta para o prox teste
+			horTeste2:
+			beq $t6, 1, horTeste3		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			beq $t7, 2, horTeste3		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, -36($s0)		# recebe o valor da diagonal cima à direita de cima do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste3			# else salta para o prox teste
+			horTeste3:
+			beq $t7, 2, horTeste4		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, 4($s0)			# recebe o valor da direita do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste4			# else salta para o prox teste
+			horTeste4:
+			beq $t6, 2, horTeste5		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+			beq $t7, 2, horTeste5		# Se $t6 = 1 não é para validar coluna da esquerda então dou skip a esta validação
+			lw $t4, 44($s0)			# recebe o valor da diagonal baixo à direita do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste5			# else salta para o prox teste
+			horTeste5:
+			beq $t6, 2, horTeste6		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+			lw $t4, 40($s0)			# recebe o valor da linha de baixo do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste6			# else salta para o prox teste
+			horTeste6:
+			beq $t6, 2, horTeste7		# Se $t6 = 2 não é para validar linha de baixo então dou skip a esta validação
+			beq $t7, 1, horTeste7		# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			lw $t4, 36($s0)			# recebe o valor da diagonal baixo à esquerda do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j horTeste7			# else salta para o prox teste
+			horTeste7:
+			beq $t6, 1, sairTesteHor	# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			beq $t7, 1, sairTesteHor	# Se $t6 = 1 não é para validar linha de cima então dou skip a esta validação
+			lw $t4, -44($s0)		# recebe o valor da diagonal de cima à esquerda do tabulerio
+			bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
+			j sairTesteHor			# else salta para o prox teste
+			
+			sairTesteHor:
 			j sairDeAxis
 		sairDeAxis:
 		addi $s1, $s1, 4		# Mudar de posição do vetor
@@ -338,4 +431,111 @@ displayTabuleiro_1for:
 	addi $t1, $t1, 1
 	j displayTabuleiro_1for
 sair_displayTabuleiro_1for:
+jr $ra
+
+validarCima:
+add $v0, $t6, $0
+add $a0, $t1, $0
+bge $a0, 10, sairValidarCima	# if($t1 >= 10) salta para o prox teste pois não estamos na primeira linha
+addi $v0, $0, 1			# Igual $t6 a 1 para saber que não vou validar a linha de cima (pois não existe)
+sairValidarCima:
+jr $ra
+	
+validarBaixo:
+add $v0, $t6, $0
+add $a0, $t1, $0
+blt $a0, 90, sairValidarBaixo	# if($t1 < 90) sai dos testes pois não estamos na linha de baixo
+addi $v0, $0, 2			# Igual $t6 a 2 para saber que não vou validar a linha de baixo (pois não existe)
+sairValidarBaixo:
+jr $ra
+
+validacoesEsquerda:
+add $v0, $t7, $0
+add $a0, $t1, $0				# Validações para saber se vou validar à esquerda (basicamente saber se esta posição é a mais à esquerda da linha pois é a unica que não precisa validar à esquerda)
+	bne $a0, 0, t7Test1_Esq			# if($t1 != 0)	valor à esquerda da 1ª linha salta para prox teste
+		addi $v0, $0, 1			# else adiciona 1 a $t7 para saber que não vou validar à esquerda
+		j validacoesEsquerdaSair	# Salta para as validacoes das posições à volta
+	t7Test1_Esq:
+	bne $a0, 40, t7Test2_Esq		# Mesmo da validação de cima mas para a 2ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test2_Esq:
+	bne $a0, 80, t7Test3_Esq		# Mesmo da validação de cima mas para a 3ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test3_Esq:
+	bne $a0, 120, t7Test4_Esq		# Mesmo da validação de cima mas para a 4ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test4_Esq:
+	bne $a0, 160, t7Test5_Esq		# Mesmo da validação de cima mas para a 5ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test5_Esq:
+	bne $a0, 200, t7Test6_Esq		# Mesmo da validação de cima mas para a 6ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test6_Esq:
+	bne $a0, 240, t7Test7_Esq		# Mesmo da validação de cima mas para a 7ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test7_Esq:
+	bne $a0, 280, t7Test8_Esq		# Mesmo da validação de cima mas para a 8ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test8_Esq:
+	bne $a0, 320, t7Test9_Esq		# Mesmo da validação de cima mas para a 9ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+	t7Test9_Esq:
+	bne $a0, 360, validacoesEsquerdaSair	# Mesmo da validação de cima mas para a 10ª linha
+		addi $v0, $0, 1
+		j validacoesEsquerdaSair
+validacoesEsquerdaSair:
+jr $ra
+
+
+validacoesDireita:		# Validações para saber se vou validar à direita (basicamente saber se esta posição é a mais à direita da linha pois é a unica que não precisa validar à direita)
+add $v0, $t7, $0
+add $a0, $t1, $0
+	bne $a0, 36, t7Test1_Dir	# if($t1 != 0)	valor à direita da 1ª linha salta para prox teste
+		addi $v0, $0, 2		# else adiciona 1 a $t7 para saber que não vou validar à direita
+		j validacoesDireitaSair	# Salta para as validacoes das posições à volta
+	t7Test1_Dir:
+	bne $a0, 76, t7Test2_Dir	# Mesmo da validação de cima mas para a 2ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test2_Dir:
+	bne $a0, 116, t7Test3_Dir	# Mesmo da validação de cima mas para a 3ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test3_Dir:
+	bne $a0, 156, t7Test4_Dir	# Mesmo da validação de cima mas para a 4ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test4_Dir:
+	bne $a0, 196, t7Test5_Dir	# Mesmo da validação de cima mas para a 5ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test5_Dir:
+	bne $a0, 236, t7Test6_Dir	# Mesmo da validação de cima mas para a 6ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test6_Dir:
+	bne $a0, 276, t7Test7_Dir	# Mesmo da validação de cima mas para a 7ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test7_Dir:
+	bne $a0, 316, t7Test8_Dir	# Mesmo da validação de cima mas para a 8ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test8_Dir:
+	bne $a0, 356, t7Test9_Dir	# Mesmo da validação de cima mas para a 9ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+	t7Test9_Dir:
+	bne $a0, 396, validacoesDireitaSair	# Mesmo da validação de cima mas para a 10ª linha
+		addi $v0, $0, 2
+		j validacoesDireitaSair
+validacoesDireitaSair:
 jr $ra
