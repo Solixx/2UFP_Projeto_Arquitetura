@@ -6,6 +6,8 @@ JogadaRepetida:	.asciiz "Posicao inserida anteriormente, insira posicao nova \n"
 JogadaAgua:	.asciiz "Agua \n"
 JogadaBomba:	.asciiz "Bomba \n"
 JogadaAfundou:	.asciiz "Afundou \n"
+Menu:		.asciiz "Insira 'a' -> Jogar Sozinho / 'b' -> Jogar Vs PC / 'e' -> Sair \n"
+teclaMenuErro:	.asciiz "Essa opção não existe no menu, insira um nova opção \n"
 
 .align 2
 tabuleiro: 	.space 400	# Tabuleiro 
@@ -23,8 +25,34 @@ patrol:		.space 8	# Braco Carrier (1- Letra / 2- Tamanho)
 .text
 .globl main
 main:
-
-jal fase1Main
+# $t1 -> opção
+cicloMenu:
+	li $v0, 4
+	la $a0, Menu
+	syscall
+	li $v0, 12
+	syscall
+	add $t1, $v0, $0
+	li $v0, 4
+	la $a0, Enter
+	syscall
+	beq $t1, 'e', sairPrograma
+		beq $t1, 'a', jogoSozinho
+		beq $t1, 'b', jogoPc
+		teclaErrada:
+		li $v0, 4
+		la $a0, teclaMenuErro
+		syscall
+		j cicloMenu
+		jogoSozinho:
+		jal fase1Main
+		j cicloMenu
+		jogoPc:
+		#jal fase2Main
+		j cicloMenu
+	sairPrograma:
+	j Exit
+j Exit
 
 Exit:
 li $v0, 10
@@ -86,7 +114,8 @@ lw $t1, 4($a0)
 #addi $t1, $0, 2
 #li $t2, 'P'
 jal gerarTabuleiro
-jal displayTabuleiro
+
+#jal displayTabuleiro
 
 la $s1, barcos
 jal jogo
@@ -194,6 +223,7 @@ sairJogo:
 lw $ra, 0($sp)
 add $sp, $sp, 4
 jr $ra
+
 
 zerarTabuleiroCopia:
 #t1 -> i
