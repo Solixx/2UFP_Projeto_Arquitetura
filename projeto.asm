@@ -2,6 +2,10 @@
 MSGColuna: 	.asciiz "Insira uma coluna \n"
 MSGLinha: 	.asciiz "Insira uma linha \n"
 Enter:		.asciiz "\n"
+JogadaRepetida:	.asciiz "Posicao inserida anteriormente, insira posicao nova \n"
+JogadaAgua:	.asciiz "Agua \n"
+JogadaBomba:	.asciiz "Bomba \n"
+JogadaAfundou:	.asciiz "Afundou \n"
 
 .align 2
 tabuleiro: 	.space 400	# Tabuleiro 
@@ -95,12 +99,82 @@ jr $ra
 
 jogo:
 # a0 -> endereço dos barcos
+# $s0 -> endereço do tabuleiro
+# $s1 -> endereço do copiaTabuleiro
+# $t1 -> char coluna
+# $t2 -> numero linha
+# $t3 -> posição escolhida pelo utilizador final / size do barco acertado
+# $t4 -> valores dos tabuleiros
+# $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
+# $t6 -> contadores de barcos
 
 add $sp, $sp, -4
 sw $ra, 0($sp)
 #TODO
+la $s0, tabuleiro
+la $s1, copiaTabuleiro
 jal zerarTabuleiroCopia
-jal displayTabuleiroJogo
+cicloJogo:
+	jal displayTabuleiroJogo
+	posUtilizador:
+	la $a0, barcos
+	li $v0, 12
+	syscall
+	add $t1, $v0, $0
+	li $v0, 5
+	syscall
+	add $t2, $v0, $0
+	addi $t1, $t1, -97	# Passar de A -> 1, b -> 2 etc... (96 é o valor de A)
+	mul $t1, $t1, 4
+	mul $t2, $t2, 40
+	add $t3, $t1, $t2
+	bge $t3, 400, posUtilizador
+	
+	la $s0, tabuleiro
+	la $s1, copiaTabuleiro
+	add $s1, $s1, $t3
+	lw $t4, 0($s1)
+	bne $t4, '-', jogadaRepetida
+		add $s0, $s0, $t3
+		lw $t4, 0($s0)
+		beq $t4, 0, aguaJogada
+		la $a0, barcos
+		cicloVerArrayBarco:
+			lw $t6, 0($a0)
+			bne $t4, $t6, incrementar_a0
+			lw $t3, 4($a0)
+			lw $t6, 8($a0)
+			addi $t6, $t6, 1
+			sw $t6, 8($a0)
+			la $t5, 'X'
+			sw $t5, 0($s1)
+			jal displayTabuleiroJogo
+			bne $t3, $t6, acertouJogada
+				li $v0, 4
+				la $a0, JogadaAfundou
+				syscall
+			acertouJogada:
+			li $v0, 4
+			la $a0, JogadaBomba
+			syscall
+			j posUtilizador
+			incrementar_a0:
+			addi $a0, $a0, 12 
+			j cicloVerArrayBarco
+		aguaJogada:
+		la $t5, '0'
+		sw $t5, 0($s1)
+		jal displayTabuleiroJogo
+		li $v0, 4
+		la $a0, JogadaAgua
+		syscall
+		j posUtilizador
+	jogadaRepetida:
+	li $v0, 4
+	la $a0, JogadaRepetida
+	syscall
+	j posUtilizador
+j cicloJogo
 #TODO
 lw $ra, 0($sp)
 add $sp, $sp, 4
