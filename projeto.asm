@@ -625,6 +625,7 @@ displayTabuleiroJogo:
 #t2 -> j
 #t3 -> endere?o
 #t4 -> val do endere?o
+# $t5 -> valor da posicao do array tabuleiro
 la $s0, copiaTabuleiro
 #add $t3, $0, $0
 add $t1, $0, $0
@@ -636,12 +637,21 @@ displayTabuleiroJogo_1for:
 		bge $t2, 10, sair_displayTabuleiroJogo_2for		# j >= 10 sai do ciclo
 		#add $s0, $t3, $0
 		#add $t3, $a0, $0
-		li $v0, 4
 		lw $t4, 0($s0)
+		beq $t4, '-', printStringJogo
+		beq $t4, '0', printStringJogo
+		beq $t4, 'X', printStringJogo
+		li $v0, 1
+		move $a0, $t4
+		syscall
+		j incrementarS0
+		printStringJogo:
+		li $v0, 4
 		sw $t4, valCopiaTabuleiro
 		la $a0, valCopiaTabuleiro
 		syscall
 		#add $t3, $t3, 4
+		incrementarS0:
 		addi $s0, $s0, 4
 		addi $t2, $t2, 1
 		j displayTabuleiroJogo_2for
