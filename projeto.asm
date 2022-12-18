@@ -157,7 +157,7 @@ cicloJogo:
 			li $v0, 4
 			la $a0, JogadaBomba
 			syscall
-			j posUtilizador
+			j chekarSeTodosBarcosAfundaram
 			incrementar_a0:
 			addi $a0, $a0, 12 
 			j cicloVerArrayBarco
@@ -169,6 +169,20 @@ cicloJogo:
 		la $a0, JogadaAgua
 		syscall
 		j posUtilizador
+		
+		chekarSeTodosBarcosAfundaram:
+		la $a0, barcos
+		# t4 -> barco
+		# t5 -> size barco
+		# t6 -> contador barco
+		ciclo_chekarSeTodosBarcosAfundaram:
+		lw $t4, 0($a0)
+		lw $t5, 4($a0)
+		lw $t6, 8($a0)
+		bne $t5, $t6, posUtilizador
+		bge $t4, 100, sairJogo
+		add $a0, $a0, 12
+		j ciclo_chekarSeTodosBarcosAfundaram
 	jogadaRepetida:
 	li $v0, 4
 	la $a0, JogadaRepetida
@@ -176,6 +190,7 @@ cicloJogo:
 	j posUtilizador
 j cicloJogo
 #TODO
+sairJogo:
 lw $ra, 0($sp)
 add $sp, $sp, 4
 jr $ra
@@ -605,6 +620,9 @@ addBarcoArrayBarcos:
 	sw $a0, 0($a2)
 	addi $a2, $a2, 4
 	sw $0, 0($a2)
+	addi $a2, $a2, 4
+	addi $t9, $0, 100	# Usar $t9 para meter -1 valor que vai ser usado como fim do array dos barcos
+	sw $t9, 0($a2)		# Numero 0 no fim do array usado depois para validações noutras funções ex: jogo (para saber o fim do array dos barcos)
 sairGerarBarco:
 addi $v0, $a1, 1
 lw $ra, 0($sp)
