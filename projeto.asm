@@ -10,6 +10,11 @@ Menu:			.asciiz "Insira 'a' -> Jogar Sozinho / 'b' -> Jogar Vs PC / 'e' -> Sair 
 teclaMenuErro:		.asciiz "Essa op??o n?o existe no menu, insira um nova op??o \n"
 vezJogarPC:		.asciiz "Vez Do Computador \n"
 vezJogarUtilizador:	.asciiz "Vez Do Utilizador \n"
+editNumCarrier:		.asciiz "Insira o numero de barcos Carrier (max de barcos = 10)\n"
+editNumBattleship:	.asciiz "Insira o numero de barcos Battleship (max = 10)\n"
+editNumDestroyer:	.asciiz "Insira o numero de barcos Destroyer (max = 10)\n"
+editNumSubmarine:	.asciiz "Insira o numero de barcos Submarine (max = 10)\n"
+editNumPatrol:		.asciiz "Insira o numero de barcos Patrol (max = 10)\n"
 
 .align 2
 tabuleiro: 		.space 400	# Tabuleiro 
@@ -148,102 +153,232 @@ fase2Main:
 # $s1 -> endere?o dos barcos
 # $s2 -> numero do barco
 # $s3 -> endere?o dos barcosPC
+# $s4 -> contador de barcos (max 10)
+# $s5 -> I
+# $t0 -> numero de barcos (menu utilizador)
 # $t1 -> tamanho do barco
 # $t2 -> letra do Barco
 
-addi $sp, $sp, -4
+addi $sp, $sp, -12
 sw $ra, 0($sp)
+add $s4, $0, $0
+sw $s4, 4($sp)
+add $s5, $0, $0
+sw $s5, 8($sp)
 # Tabuleiro Para Jogador
+la $s1, barcosPC
+#addi $s2, $0, 1
+#jal barcosPadra
+la $s0, tabuleiroPC
+jal zerarTabuleiro
+
 la $s1, barcos
 addi $s2, $0, 1
 jal barcosPadra
 la $s0, tabuleiro
 jal zerarTabuleiro
 
+numCarrier:
+li $v0, 4
+la $a0, editNumCarrier
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 8($sp)
+cicloNumCarrier:
+bge $s5, $t0, numBattleship
+lw $s4, 4($sp)
+bge $s4, 10, iniciarJogoPC
+#Gerar Carrier Utilizador
+la $s1, barcos
 la $a0, carrier
 lw $t1, 4($a0)
 la $s0, tabuleiro
 jal gerarTabuleiro
-
+#Gerar Carrier PC
+la $s1, barcosPC
+la $a0, carrier
+lw $t1, 4($a0)
+la $s0, tabuleiroPC
+jal gerarTabuleiro
 add $s2, $v0, $0
-la $s0, tabuleiro
+addi $s4, $s4, 1
+sw $s4, 4($sp)
+addi $s5, $s5, 1
+j cicloNumCarrier
+
+numBattleship:
+li $v0, 4
+la $a0, editNumBattleship
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 8($sp)
+cicloNumBattleship:
+bge $s5, $t0, numDestroyer
+lw $s4, 4($sp)
+bge $s4, 10, iniciarJogoPC
 addi $s1, $s1, 12
+#Gerar Carrier Utilizador
 la $a0, battleship
-lw $t2, 0($a0)
 lw $t1, 4($a0)
 la $s0, tabuleiro
 jal gerarTabuleiro
-
-addi $s1, $s1, 12
+#Gerar Carrier PC
+la $s1, barcosPC
+la $a0, battleship
+lw $t1, 4($a0)
+la $s0, tabuleiroPC
+jal gerarTabuleiro
 add $s2, $v0, $0
+addi $s4, $s4, 1
+sw $s4, 4($sp)
+addi $s5, $s5, 1
+j cicloNumBattleship
+
+
+numDestroyer:
+li $v0, 4
+la $a0, editNumDestroyer
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 8($sp)
+cicloNumDestroyer:
+bge $s5, $t0, numSubmarine
+lw $s4, 4($sp)
+bge $s4, 10, iniciarJogoPC
+addi $s1, $s1, 12
+#Gerar Carrier Utilizador
 la $a0, destroyer
 lw $t1, 4($a0)
 la $s0, tabuleiro
 jal gerarTabuleiro
-
-la $s0, tabuleiro
-addi $s1, $s1, 12
+#Gerar Carrier PC
+la $s1, barcosPC
+la $a0, destroyer
+lw $t1, 4($a0)
+la $s0, tabuleiroPC
+jal gerarTabuleiro
 add $s2, $v0, $0
+addi $s4, $s4, 1
+sw $s4, 4($sp)
+addi $s5, $s5, 1
+j cicloNumDestroyer
+
+numSubmarine:
+li $v0, 4
+la $a0, editNumSubmarine
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 8($sp)
+cicloNumSubmarine:
+bge $s5, $t0, numPatrol
+lw $s4, 4($sp)
+bge $s4, 10, iniciarJogoPC
+addi $s1, $s1, 12
+#Gerar Carrier Utilizador
 la $a0, submarine
 lw $t1, 4($a0)
 la $s0, tabuleiro
 jal gerarTabuleiro
-
-la $s0, tabuleiro
-addi $s1, $s1, 12
+#Gerar Carrier PC
+la $s1, barcosPC
+la $a0, submarine
+lw $t1, 4($a0)
+la $s0, tabuleiroPC
+jal gerarTabuleiro
 add $s2, $v0, $0
+addi $s4, $s4, 1
+sw $s4, 4($sp)
+addi $s5, $s5, 1
+j cicloNumSubmarine
+
+numPatrol:
+li $v0, 4
+la $a0, editNumPatrol
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 8($sp)
+cicloNumPatrol:
+bge $s5, $t0, iniciarJogoPC
+lw $s4, 4($sp)
+bge $s4, 10, iniciarJogoPC
+addi $s1, $s1, 12
+#Gerar Carrier Utilizador
 la $a0, patrol
 lw $t1, 4($a0)
 la $s0, tabuleiro
 jal gerarTabuleiro
-
-la $s0, tabuleiro
-jal displayTabuleiro
+#Gerar Carrier PC
+la $s1, barcosPC
+la $a0, patrol
+lw $t1, 4($a0)
+la $s0, tabuleiroPC
+jal gerarTabuleiro
+add $s2, $v0, $0
+add $s2, $v0, $0
+addi $s4, $s4, 1
+sw $s4, 4($sp)
+addi $s5, $s5, 1
+j cicloNumPatrol
 
 
 # Tabuleiro Para PC
-la $s1, barcosPC
-addi $s2, $0, 1
-jal barcosPadra
-la $s0, tabuleiroPC
-jal zerarTabuleiro
+#la $s1, barcosPC
+#addi $s2, $0, 1
+#jal barcosPadra
+#la $s0, tabuleiroPC
+#jal zerarTabuleiro
 
-la $a0, carrier
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
+#la $a0, carrier
+#lw $t1, 4($a0)
+#la $s0, tabuleiroPC
+#jal gerarTabuleiro
 
-add $s2, $v0, $0
-la $s0, tabuleiroPC
-addi $s1, $s1, 12
-la $a0, battleship
-lw $t2, 0($a0)
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
+#add $s2, $v0, $0
+#la $s0, tabuleiroPC
+#addi $s1, $s1, 12
+#la $a0, battleship
+#lw $t2, 0($a0)
+#lw $t1, 4($a0)
+#la $s0, tabuleiroPC
+#jal gerarTabuleiro
 
-addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, destroyer
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
+#addi $s1, $s1, 12
+#add $s2, $v0, $0
+#la $a0, destroyer
+#lw $t1, 4($a0)
+#la $s0, tabuleiroPC
+#jal gerarTabuleiro
 
-la $s0, tabuleiroPC
-addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, submarine
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
+#la $s0, tabuleiroPC
+#addi $s1, $s1, 12
+#add $s2, $v0, $0
+#la $a0, submarine
+#lw $t1, 4($a0)
+#la $s0, tabuleiroPC
+#jal gerarTabuleiro
 
-la $s0, tabuleiroPC
-addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, patrol
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
+#la $s0, tabuleiroPC
+#addi $s1, $s1, 12
+#add $s2, $v0, $0
+#la $a0, patrol
+#lw $t1, 4($a0)
+#la $s0, tabuleiroPC
+#jal gerarTabuleiro
+
+
+iniciarJogoPC:
+la $s0, tabuleiro
+jal displayTabuleiro
 
 la $s0, tabuleiroPC
 jal displayTabuleiro
@@ -253,7 +388,7 @@ la $s3, barcosPC
 jal jogoPC
 
 lw $ra, 0($sp)
-addi $sp, $sp, 4
+addi $sp, $sp, 12
 jr $ra
 
 
