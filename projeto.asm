@@ -10,11 +10,19 @@ Menu:			.asciiz "Insira 'a' -> Jogar Sozinho / 'b' -> Jogar Vs PC / 'e' -> Sair 
 teclaMenuErro:		.asciiz "Essa op??o n?o existe no menu, insira um nova op??o \n"
 vezJogarPC:		.asciiz "Vez Do Computador \n"
 vezJogarUtilizador:	.asciiz "Vez Do Utilizador \n"
+editSizeBarcosMenu:	.asciiz "Editar tamanho dos Barcos? 1 -> Editar \n"
+editSizeBarcoOption:	.asciiz "0 -> Utilizar Tamanho Padrao / Tamanho maximo de um barco e 10 \n"
+editSizeBarco:		.asciiz "Editar tamanho do Barco - "
 editNumCarrier:		.asciiz "Insira o numero de barcos Carrier (max de barcos = 10)\n"
 editNumBattleship:	.asciiz "Insira o numero de barcos Battleship (max = 10)\n"
 editNumDestroyer:	.asciiz "Insira o numero de barcos Destroyer (max = 10)\n"
 editNumSubmarine:	.asciiz "Insira o numero de barcos Submarine (max = 10)\n"
 editNumPatrol:		.asciiz "Insira o numero de barcos Patrol (max = 10)\n"
+barcoCarrier:		.asciiz "Carrier\n"
+barcoBattleship:	.asciiz "Battleship\n"
+barcoDestroyer:		.asciiz "Destroyer\n"
+barcoSubmarine:		.asciiz "Submarine\n"
+barcoPatrol:		.asciiz "Patrol\n"
 
 .align 2
 tabuleiro: 		.space 400	# Tabuleiro 
@@ -170,16 +178,32 @@ add $s6, $0, $0
 sw $s6, 12($sp)
 # Tabuleiro Para Jogador
 
-#li $v0, 
+li $v0, 4
+la $a0, editSizeBarcosMenu
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+beq $t0, 1, editarSizeBarcos
 la $s1, barcosPC
 #addi $s2, $0, 1
 jal barcosPadra
+j sairBarcos
+la $s1, barcos
+jal barcosPadra
+editarSizeBarcos:
+la $s1, barcosPC
+#jal barcosEdit
+la $s1, barcos
+jal barcosEdit
+sairBarcos:
+addi $s2, $0, 1
 la $s0, tabuleiroPC
 jal zerarTabuleiro
 
-la $s1, barcos
-addi $s2, $0, 1
-jal barcosPadra
+#la $s1, barcos
+#addi $s2, $0, 1
+#jal barcosPadra
 la $s0, tabuleiro
 jal zerarTabuleiro
 
@@ -1321,6 +1345,129 @@ sw $t1, 0($s0)
 addi $t1, $0, 2
 sw $t1, 4($s0)
 jr $ra
+
+
+
+barcosEdit:
+# $s0 -> endere?o do barco
+# $t0 -> tamanho do barco
+# $t1 -> valores
+
+li $v0, 4
+la $a0, editSizeBarcoOption
+syscall
+li $v0, 4
+la $a0, editSizeBarco
+syscall
+li $v0, 4
+la $a0, barcoCarrier
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+
+carrierBarcoEdit:
+la $s0, carrier
+la $t1, 'C'
+sw $t1, 0($s0)
+ble $t0, 0, tamanhoPadraoCarrier
+add $t1, $0, $t0
+j skipEditCarrier
+tamanhoPadraoCarrier:
+addi $t1, $0, 5
+skipEditCarrier:
+sw $t1, 4($s0)
+
+li $v0, 4
+la $a0, editSizeBarco
+syscall
+li $v0, 4
+la $a0, barcoBattleship
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+
+battleshipBarcoEdit:
+la $s0, battleship
+la $t1, 'B'
+sw $t1, 0($s0)
+ble $t0, 0, tamanhoPadraoBattleship
+add $t1, $0, $t0
+j skipEditBattleship
+tamanhoPadraoBattleship:
+addi $t1, $0, 4
+skipEditBattleship:
+sw $t1, 4($s0)
+
+li $v0, 4
+la $a0, editSizeBarco
+syscall
+li $v0, 4
+la $a0, barcoDestroyer
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+
+destroyerBarcoEdit:
+la $s0, destroyer
+la $t1, 'D'
+sw $t1, 0($s0)
+ble $t0, 0, tamanhoPadraoDestroyer
+add $t1, $0, $t0
+j skipEditDestroyer
+tamanhoPadraoDestroyer:
+addi $t1, $0, 3
+skipEditDestroyer:
+sw $t1, 4($s0)
+
+li $v0, 4
+la $a0, editSizeBarco
+syscall
+li $v0, 4
+la $a0, barcoSubmarine
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+
+submarineBarcoEdit:
+la $s0, submarine
+la $t1, 'S'
+sw $t1, 0($s0)
+ble $t0, 0, tamanhoPadraoSubmarine
+add $t1, $0, $t0
+j skipEditSubmarine
+tamanhoPadraoSubmarine:
+addi $t1, $0, 3
+skipEditSubmarine:
+sw $t1, 4($s0)
+
+li $v0, 4
+la $a0, editSizeBarco
+syscall
+li $v0, 4
+la $a0, barcoPatrol
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+
+patrolBarcoEdit:
+la $s0, patrol
+la $t1, 'P'
+sw $t1, 0($s0)
+ble $t0, 0, tamanhoPadraoPatrol
+add $t1, $0, $t0
+j skipEditPatrol
+tamanhoPadraoPatrol:
+addi $t1, $0, 2
+skipEditPatrol:
+sw $t1, 4($s0)
+jr $ra
+
+
 
 gerarNumeroRandom:
 li $a1, 100	#valor maximo do numero aleatorio
