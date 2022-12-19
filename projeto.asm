@@ -23,6 +23,8 @@ barcoBattleship:	.asciiz "Battleship\n"
 barcoDestroyer:		.asciiz "Destroyer\n"
 barcoSubmarine:		.asciiz "Submarine\n"
 barcoPatrol:		.asciiz "Patrol\n"
+pontosUtilizador:	.asciiz "Pontuacao Utilizador: "
+pontosPC:		.asciiz "Pontuacao PC: "
 
 .align 2
 tabuleiro: 		.space 400	# Tabuleiro 
@@ -39,6 +41,7 @@ battleship:		.space 8	# Braco Carrier (1- Letra / 2- Tamanho)
 destroyer:		.space 8	# Braco Carrier (1- Letra / 2- Tamanho)
 submarine:		.space 8	# Braco Carrier (1- Letra / 2- Tamanho)
 patrol:			.space 8	# Braco Carrier (1- Letra / 2- Tamanho)
+arrayPontuacao:		.space 8	# Pontuacoes (1 -> Utilizador / 2 -> PC)
 
 .text
 .globl main
@@ -143,7 +146,7 @@ la $s0, tabuleiro
 jal gerarTabuleiro
 
 la $s0, tabuleiro
-jal displayTabuleiro
+#jal displayTabuleiro
 
 la $s1, barcos
 jal jogo
@@ -164,11 +167,13 @@ fase2Main:
 # $s4 -> contador de barcos (max 10)
 # $s5 -> I
 # $s6 -> contador da pos atual do array de barcos
+# $s7 -> endereço do array de pontuacoes
 # $t0 -> Editar tamanho de barcos ou nao (1 -> editar) / numero de barcos (menu utilizador)
 # $t1 -> tamanho do barco
 # $t2 -> letra do Barco
+# $t3 -> pontuacoes
 
-addi $sp, $sp, -16
+addi $sp, $sp, -20
 sw $ra, 0($sp)
 add $s4, $0, $0
 sw $s4, 4($sp)
@@ -176,6 +181,8 @@ add $s5, $0, $0
 sw $s5, 8($sp)
 add $s6, $0, $0
 sw $s6, 12($sp)
+la $s7, arrayPontuacao
+sw $s7, 16($sp)
 # Tabuleiro Para Jogador
 
 li $v0, 4
@@ -425,14 +432,35 @@ la $s0, tabuleiro
 jal displayTabuleiro
 
 la $s0, tabuleiroPC
-jal displayTabuleiro
+#jal displayTabuleiro
 
 la $s1, barcos
 la $s3, barcosPC
 jal jogoPC
 
+li $v0, 4
+la $a0, pontosUtilizador
+syscall
+li $v0, 1
+lw $t3, 0($s7)
+move $a0, $t3
+syscall
+li $v0, 4
+la $a0, Enter
+syscall
+li $v0, 4
+la $a0, pontosPC
+syscall
+li $v0, 1
+lw $t3, 4($s7)
+move $a0, $t3
+syscall
+li $v0, 4
+la $a0, Enter
+syscall
+
 lw $ra, 0($sp)
-addi $sp, $sp, 16
+addi $sp, $sp, 20
 jr $ra
 
 
@@ -557,6 +585,7 @@ jr $ra
 jogoPC:
 # a0 -> endere?o dos barcos
 # a1 -> endereco dos barcosPC
+# a2 -> Pontuacoes
 # $s0 -> endere?o do tabuleiro
 # $s1 -> endere?o do copiaTabuleiro
 # $s2 -> endere?o do tabuleiroPC
@@ -575,6 +604,7 @@ add $sp, $sp, -12
 sw $ra, 0($sp)
 #TODO
 add $a0, $s1, $0
+add $a2, $s7, $0
 sw $a0, 4($sp)
 add $a1, $s3, $0
 sw $a1, 8($sp)
@@ -654,7 +684,7 @@ cicloJogoPC:
 		lw $t5, 4($a1)
 		lw $t6, 8($a1)
 		bne $t5, $t6, vezUtilizador
-		bge $t4, 100, sairJogoPC
+		bge $t4, 100, vitoriaUtilizador
 		add $a1, $a1, 12
 		j ciclo_chekarSeTodosBarcosAfundaramUtilizador
 	jogadaRepetidaUtilizador:
@@ -716,6 +746,35 @@ cicloJogoPC:
 	jogadaRepetidaPC:
 	j vezPC
 j cicloJogoPC
+
+vitoriaUtilizador:
+lw $t5, 0($a2)
+addi $t4, $t5, 5
+sw $t4, 0($a2)
+lw $t5, 4($a2)
+addi $t4, $t5, -3
+blt $t4, 0, igualarDerrotaPC0
+sw $t4, 4($a2)
+j sairJogoPC
+igualarDerrotaPC0:
+add $t4, $0, $0
+sw $t4, 4($a2)
+j sairJogoPC
+
+vitoriaPC:
+lw $t5, 4($a2)
+addi $t4, $t5, 5
+sw $t4, 4($a2)
+lw $t5, 0($a2)
+addi $t4, $t5, -3
+blt $t4, 0, igualarDerrotaUtilizador0
+sw $t4, 0($a2)
+j sairJogoPC
+igualarDerrotaUtilizador0:
+add $t4, $0, $0
+sw $t4, 0($a2)
+j sairJogoPC
+
 
 sairJogoPC:
 zerarArrayBarcosPC:
