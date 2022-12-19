@@ -155,20 +155,25 @@ fase2Main:
 # $s3 -> endere?o dos barcosPC
 # $s4 -> contador de barcos (max 10)
 # $s5 -> I
-# $t0 -> numero de barcos (menu utilizador)
+# $s6 -> contador da pos atual do array de barcos
+# $t0 -> Editar tamanho de barcos ou nao (1 -> editar) / numero de barcos (menu utilizador)
 # $t1 -> tamanho do barco
 # $t2 -> letra do Barco
 
-addi $sp, $sp, -12
+addi $sp, $sp, -16
 sw $ra, 0($sp)
 add $s4, $0, $0
 sw $s4, 4($sp)
 add $s5, $0, $0
 sw $s5, 8($sp)
+add $s6, $0, $0
+sw $s6, 12($sp)
 # Tabuleiro Para Jogador
+
+#li $v0, 
 la $s1, barcosPC
 #addi $s2, $0, 1
-#jal barcosPadra
+jal barcosPadra
 la $s0, tabuleiroPC
 jal zerarTabuleiro
 
@@ -192,12 +197,14 @@ lw $s4, 4($sp)
 bge $s4, 10, iniciarJogoPC
 #Gerar Carrier Utilizador
 la $s1, barcos
+add $s1, $s1, $s6
 la $a0, carrier
 lw $t1, 4($a0)
 la $s0, tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 la $s1, barcosPC
+add $s1, $s1, $s6
 la $a0, carrier
 lw $t1, 4($a0)
 la $s0, tabuleiroPC
@@ -206,6 +213,7 @@ add $s2, $v0, $0
 addi $s4, $s4, 1
 sw $s4, 4($sp)
 addi $s5, $s5, 1
+addi $s6, $s6, 12
 j cicloNumCarrier
 
 numBattleship:
@@ -220,7 +228,8 @@ cicloNumBattleship:
 bge $s5, $t0, numDestroyer
 lw $s4, 4($sp)
 bge $s4, 10, iniciarJogoPC
-addi $s1, $s1, 12
+la $s1, barcos
+add $s1, $s1, $s6
 #Gerar Carrier Utilizador
 la $a0, battleship
 lw $t1, 4($a0)
@@ -228,6 +237,7 @@ la $s0, tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 la $s1, barcosPC
+add $s1, $s1, $s6
 la $a0, battleship
 lw $t1, 4($a0)
 la $s0, tabuleiroPC
@@ -236,6 +246,7 @@ add $s2, $v0, $0
 addi $s4, $s4, 1
 sw $s4, 4($sp)
 addi $s5, $s5, 1
+addi $s6, $s6, 12
 j cicloNumBattleship
 
 
@@ -251,7 +262,8 @@ cicloNumDestroyer:
 bge $s5, $t0, numSubmarine
 lw $s4, 4($sp)
 bge $s4, 10, iniciarJogoPC
-addi $s1, $s1, 12
+la $s1, barcos
+add $s1, $s1, $s6
 #Gerar Carrier Utilizador
 la $a0, destroyer
 lw $t1, 4($a0)
@@ -259,6 +271,7 @@ la $s0, tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 la $s1, barcosPC
+add $s1, $s1, $s6
 la $a0, destroyer
 lw $t1, 4($a0)
 la $s0, tabuleiroPC
@@ -267,6 +280,7 @@ add $s2, $v0, $0
 addi $s4, $s4, 1
 sw $s4, 4($sp)
 addi $s5, $s5, 1
+addi $s6, $s6, 12
 j cicloNumDestroyer
 
 numSubmarine:
@@ -281,7 +295,8 @@ cicloNumSubmarine:
 bge $s5, $t0, numPatrol
 lw $s4, 4($sp)
 bge $s4, 10, iniciarJogoPC
-addi $s1, $s1, 12
+la $s1, barcos
+add $s1, $s1, $s6
 #Gerar Carrier Utilizador
 la $a0, submarine
 lw $t1, 4($a0)
@@ -289,6 +304,7 @@ la $s0, tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 la $s1, barcosPC
+add $s1, $s1, $s6
 la $a0, submarine
 lw $t1, 4($a0)
 la $s0, tabuleiroPC
@@ -297,6 +313,7 @@ add $s2, $v0, $0
 addi $s4, $s4, 1
 sw $s4, 4($sp)
 addi $s5, $s5, 1
+addi $s6, $s6, 12
 j cicloNumSubmarine
 
 numPatrol:
@@ -311,7 +328,8 @@ cicloNumPatrol:
 bge $s5, $t0, iniciarJogoPC
 lw $s4, 4($sp)
 bge $s4, 10, iniciarJogoPC
-addi $s1, $s1, 12
+la $s1, barcos
+add $s1, $s1, $s6
 #Gerar Carrier Utilizador
 la $a0, patrol
 lw $t1, 4($a0)
@@ -319,6 +337,7 @@ la $s0, tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 la $s1, barcosPC
+add $s1, $s1, $s6
 la $a0, patrol
 lw $t1, 4($a0)
 la $s0, tabuleiroPC
@@ -328,6 +347,7 @@ add $s2, $v0, $0
 addi $s4, $s4, 1
 sw $s4, 4($sp)
 addi $s5, $s5, 1
+addi $s6, $s6, 12
 j cicloNumPatrol
 
 
@@ -388,7 +408,7 @@ la $s3, barcosPC
 jal jogoPC
 
 lw $ra, 0($sp)
-addi $sp, $sp, 12
+addi $sp, $sp, 16
 jr $ra
 
 
