@@ -496,6 +496,8 @@ cicloJogo:
 	syscall
 	add $t2, $v0, $0
 	addi $t1, $t1, -97	# Passar de A -> 1, b -> 2 etc... (96 ? o valor de A)
+	bge $t1, 10, posUtilizador
+	bge $t2, 10, posUtilizador
 	mul $t1, $t1, 4
 	mul $t2, $t2, 40
 	add $t3, $t1, $t2
@@ -636,6 +638,8 @@ cicloJogoPC:
 	syscall
 	add $t2, $v0, $0
 	addi $t1, $t1, -97	# Passar de A -> 1, b -> 2 etc... (96 ? o valor de A)
+	bge $t1, 10, vezUtilizador
+	bge $t2, 10, vezUtilizador
 	mul $t1, $t1, 4
 	mul $t2, $t2, 40
 	add $t3, $t1, $t2
@@ -748,6 +752,8 @@ cicloJogoPC:
 	add $t1, $v0, $0
 	jal gerarLinhaColunaRandom
 	add $t2, $v0,$0
+	bge $t1, 10, vezPC
+	bge $t2, 10, vezPC
 	mul $t1, $t1, 4
 	mul $t2, $t2, 40
 	add $t3, $t1, $t2
