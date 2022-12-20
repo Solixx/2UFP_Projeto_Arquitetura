@@ -1,4 +1,6 @@
 .data
+frameBuffer:		.space 0x80000
+
 MSGColuna: 		.asciiz "Insira uma coluna \n"
 MSGLinha: 		.asciiz "Insira uma linha \n"
 Enter:			.asciiz "\n"
@@ -600,7 +602,7 @@ jogoPC:
 # $t6 -> contadores de barcos
 # $t7 -> vez de jogar (1 -> Utilizador / 2-> PC)
 
-add $sp, $sp, -12
+add $sp, $sp, -16
 sw $ra, 0($sp)
 #TODO
 add $a0, $s1, $0
@@ -608,14 +610,17 @@ add $a2, $s7, $0
 sw $a0, 4($sp)
 add $a1, $s3, $0
 sw $a1, 8($sp)
+sw $a2, 12($sp)
 la $s0, tabuleiro
 la $s1, copiaTabuleiro
 la $s2, tabuleiroPC
 la $s3, copiaTabuleiroPC
 add $t7, $0, $0
+addi $t9, $0, -1
 jal copiarTabuleiroCopia
 jal zerarTabuleiroCopiaPC
 cicloJogoPC:
+	jal displayTabuleiroBitMap
 	jal displayTabuleiroJogoPC
 	validarVezJogada:
 	beq $t7, 2, vezPC
@@ -648,18 +653,38 @@ cicloJogoPC:
 		cicloVerArrayBarcoUtilizador:
 			lw $t6, 0($a1)
 			bne $t4, $t6, incrementar_a1_Utilizador
+			
 			lw $t3, 4($a1)
 			lw $t6, 8($a1)
 			addi $t6, $t6, 1
 			sw $t6, 8($a1)
 			la $t5, 'X'
 			sw $t5, 0($s3)
-			jal displayTabuleiroJogoPC
+			#jal displayTabuleiroJogoPC
 			bne $t3, $t6, acertouJogadaUtilizador
 				li $v0, 4
 				la $a0, JogadaAfundou
 				syscall
 			acertouJogadaUtilizador:
+			
+			div $t1, $t1, 4
+			div $t2, $t2, 40
+			mul $t1, $t1, 25
+			mul $t2, $t2, 25
+			add $t1, $t1, 260
+			#li $a0,20
+			add $a0, $0, $t1
+			li $a1,20
+			#li $a2,20
+			add $a2, $0, $t2
+			li $a3,20
+			addi $t9, $0, 16711680		# Cor vermelho
+			jal rectangle
+		
+			lw $a0, 4($sp)
+			lw $a1, 8($sp)
+			lw $a2, 12($sp)
+			
 			li $v0, 4
 			la $a0, JogadaBomba
 			syscall
@@ -668,12 +693,32 @@ cicloJogoPC:
 			addi $a1, $a1, 12 
 			j cicloVerArrayBarcoUtilizador
 		aguaJogadaUtilizador:
+		
+		div $t1, $t1, 4
+		div $t2, $t2, 40
+		mul $t1, $t1, 25
+		mul $t2, $t2, 25
+		add $t1, $t1, 260
+		#li $a0,20
+		add $a0, $0, $t1
+		li $a1,20
+		#li $a2,20
+		add $a2, $0, $t2
+		li $a3,20
+		addi $t9, $0, 65535 	# Cor aqua
+		jal rectangle
+		
+		lw $a0, 4($sp)
+		lw $a1, 8($sp)
+		lw $a2, 12($sp)
+		
 		la $t5, '0'
 		sw $t5, 0($s3)
-		jal displayTabuleiroJogoPC
+		#jal displayTabuleiroJogoPC
 		li $v0, 4
 		la $a0, JogadaAgua
 		syscall
+		
 		addi $t7, $0, 2
 		j validarVezJogada
 		
@@ -698,8 +743,14 @@ cicloJogoPC:
 	la $a0, vezJogarPC
 	syscall
 	lw $a0, 4($sp)
-	jal gerarNumeroRandom
-	mul $t3, $v0, 4
+	#jal gerarNumeroRandom
+	jal gerarLinhaColunaRandom
+	add $t1, $v0, $0
+	jal gerarLinhaColunaRandom
+	add $t2, $v0,$0
+	mul $t1, $t1, 4
+	mul $t2, $t2, 40
+	add $t3, $t1, $t2
 	bge $t3, 400, vezPC
 	
 	la $s0, tabuleiro
@@ -721,15 +772,51 @@ cicloJogoPC:
 			sw $t6, 8($a0)
 			la $t5, 'X'
 			sw $t5, 0($s1)
-			jal displayTabuleiroJogo
+			#jal displayTabuleiroJogo
+			
+			div $t1, $t1, 4
+			div $t2, $t2, 40
+			mul $t1, $t1, 25
+			mul $t2, $t2, 25
+			#li $a0,20
+			add $a0, $0, $t1
+			li $a1,20
+			#li $a2,20
+			add $a2, $0, $t2
+			li $a3,20
+			addi $t9, $0, 16711680		# Cor vermelho
+			jal rectangle
+		
+			lw $a0, 4($sp)
+			lw $a1, 8($sp)
+			lw $a2, 12($sp)
+			
 			j chekarSeTodosBarcosAfundaramPC
 			incrementar_a0_PC:
 			addi $a0, $a0, 12
 			j cicloVerArrayBarcoPC
 		aguaJogadaPC:
+		
+		div $t1, $t1, 4
+		div $t2, $t2, 40
+		mul $t1, $t1, 25
+		mul $t2, $t2, 25
+		#li $a0,20
+		add $a0, $0, $t1
+		li $a1,20
+		#li $a2,20
+		add $a2, $0, $t2
+		li $a3,20
+		addi $t9, $0, 65535 	# Cor aqua
+		jal rectangle
+		
+		lw $a0, 4($sp)
+		lw $a1, 8($sp)
+		lw $a2, 12($sp)
+		
 		la $t5, '0'
 		sw $t5, 0($s1)
-		jal displayTabuleiroJogo
+		#jal displayTabuleiroJogo
 		addi $t7, $0, 1
 		j validarVezJogada
 		
@@ -740,7 +827,7 @@ cicloJogoPC:
 		lw $t5, 4($a0)
 		lw $t6, 8($a0)
 		bne $t5, $t6, vezPC
-		bge $t4, 100, sairJogoPC
+		bge $t4, 100, vitoriaPC
 		add $a0, $a0, 12
 		j ciclo_chekarSeTodosBarcosAfundaramPC
 	jogadaRepetidaPC:
@@ -748,6 +835,10 @@ cicloJogoPC:
 j cicloJogoPC
 
 vitoriaUtilizador:
+lw $a0, 4($sp)
+lw $a1, 8($sp)
+lw $a2, 12($sp)
+
 lw $t5, 0($a2)
 addi $t4, $t5, 5
 sw $t4, 0($a2)
@@ -762,6 +853,10 @@ sw $t4, 4($a2)
 j sairJogoPC
 
 vitoriaPC:
+lw $a0, 4($sp)
+lw $a1, 8($sp)
+lw $a2, 12($sp)
+
 lw $t5, 4($a2)
 addi $t4, $t5, 5
 sw $t4, 4($a2)
@@ -803,7 +898,7 @@ sw $t4, 0($a0)
 sw $t4, 0($a1)
 #TODO
 lw $ra, 0($sp)
-add $sp, $sp, 12
+add $sp, $sp, 16
 jr $ra
 
 copiarTabuleiroCopia:
@@ -857,6 +952,78 @@ zerar_tabuleiroCopiaPC_for:
 sair_zerar_tabuleiroCopiaPC_for:
 jr $ra
 
+
+
+displayTabuleiroBitMap:
+#a0 -> tabuleiro
+#t7 -> i
+#t8 -> j
+#t5 -> X
+#t4 -> val do endere?o
+#t6 -> Y
+#t9 -> cor
+add $sp, $sp, -4
+sw $ra, 0($sp)
+la $s0, copiaTabuleiroPC
+la $s1, copiaTabuleiro
+addi $t5, $0, 0
+add $t7, $0, $0
+addi $t6, $0, 0
+addi $t9, $0, -1
+displayTabuleiroBitMap_1for:
+	bge $t7, 10, sair_displayTabuleiroBitMap_1for		# i >= 10 sai do ciclo
+	add $t8, $0, $0
+	displayTabuleiroBitMap_2for:
+		bge $t8, 10, sair_displayTabuleiroBitMap_2for		# j >= 10 sai do ciclo
+		lw $t4, 0($s1)
+		#li $a0,100
+		add $a0, $0, $t5
+		li $a1,20
+		#li $a2,200
+		add $a2, $0, $t6
+		li $a3,20
+		bne $t4, '-', bitMapComBarco
+		jal rectangle
+		j bitMapPc
+		bitMapComBarco:
+		addi $t9, $0, 200
+		jal rectangle
+		addi $t9, $0, -1
+		j bitMapPc
+
+		bitMapPc:
+		add $t5, $t5, 260
+		lw $t4, 0($s0)
+		#li $a0,100
+		add $a0, $0, $t5
+		li $a1,20
+		#li $a2,200
+		add $a2, $0, $t6
+		li $a3,20
+		add $t5, $t5, -260
+		jal rectangle
+		
+		addi $s0, $s0, 4
+		addi $s1, $s1, 4
+		add $t5, $t5, 25
+		addi $t8, $t8, 1
+		j displayTabuleiroBitMap_2for
+	sair_displayTabuleiroBitMap_2for:
+	#li $v0, 4
+	#la $a0, Enter
+	#syscall
+	addi $t5, $0, 0
+	add $t6, $t6, 25
+	addi $t7, $t7, 1
+	j displayTabuleiroBitMap_1for
+sair_displayTabuleiroBitMap_1for:
+#li $v0, 4
+#la $a0, Enter
+#syscall
+lw $ra, 0($sp)
+add $sp, $sp, 4
+jr $ra
+
 displayTabuleiroJogo:
 #a0 -> tabuleiro
 #t1 -> i
@@ -904,7 +1071,6 @@ li $v0, 4
 la $a0, Enter
 syscall
 jr $ra
-
 
 displayTabuleiroJogoPC:
 #a0 -> tabuleiro
@@ -1527,6 +1693,13 @@ sw $t1, 4($s0)
 jr $ra
 
 
+gerarLinhaColunaRandom:
+li $a1, 10	#valor maximo do numero aleatorio
+li $v0, 42	#gerar numero aleatorio
+syscall
+add $a0, $a0, 0 #valor minimo do numero aleatorio
+add $v0, $a0, $0
+jr $ra
 
 gerarNumeroRandom:
 li $a1, 100	#valor maximo do numero aleatorio
@@ -1738,3 +1911,68 @@ add $a0, $t1, $0
 		j validacoesDireitaSair
 validacoesDireitaSair:
 jr $ra
+
+rectangleBarco:
+# $a0 is xmin (i.e., left edge; must be within the display)
+# $a1 is width (must be nonnegative and within the display)
+# $a2 is ymin  (i.e., top edge, increasing down; must be within the display)
+# $a3 is height (must be nonnegative and within the display)
+
+	beq $a1,$zero,rectangleReturn 	# zero width: draw nothing
+	beq $a3,$zero,rectangleReturn 	# zero height: draw nothing
+
+	li $t0,-1 			# color: white
+	la $t1,frameBuffer
+	add $a1,$a1,$a0 		# simplify loop tests by switching to first too-far value
+	add $a3,$a3,$a2
+	sll $a0,$a0,2 			# scale x values to bytes (4 bytes per pixel)
+	sll $a1,$a1,2
+	sll $a2,$a2,11 			# scale y values to bytes (512*4 bytes per display row)
+	sll $a3,$a3,11
+	addu $t2,$a2,$t1 		# translate y values to display row starting addresses
+	addu $a3,$a3,$t1
+	addu $a2,$t2,$a0 		# translate y values to rectangle row starting addresses
+	addu $a3,$a3,$a0
+	addu $t2,$t2,$a1 		# and compute the ending address for first rectangle row
+	li $t4,0x800 			# bytes per display row
+
+
+rectangle:
+# $a0 is xmin (i.e., left edge; must be within the display)
+# $a1 is width (must be nonnegative and within the display)
+# $a2 is ymin  (i.e., top edge, increasing down; must be within the display)
+# $a3 is height (must be nonnegative and within the display)
+
+	beq $a1,$zero,rectangleReturn 	# zero width: draw nothing
+	beq $a3,$zero,rectangleReturn 	# zero height: draw nothing
+
+	#li $t0,-1 			# color: white
+	add $t0, $0, $t9
+	la $t1,frameBuffer
+	add $a1,$a1,$a0 		# simplify loop tests by switching to first too-far value
+	add $a3,$a3,$a2
+	sll $a0,$a0,2 			# scale x values to bytes (4 bytes per pixel)
+	sll $a1,$a1,2
+	sll $a2,$a2,11 			# scale y values to bytes (512*4 bytes per display row)
+	sll $a3,$a3,11
+	addu $t2,$a2,$t1 		# translate y values to display row starting addresses
+	addu $a3,$a3,$t1
+	addu $a2,$t2,$a0 		# translate y values to rectangle row starting addresses
+	addu $a3,$a3,$a0
+	addu $t2,$t2,$a1 		# and compute the ending address for first rectangle row
+	li $t4,0x800 			# bytes per display row
+
+rectangleYloop:
+	move $t3,$a2 			# pointer to current pixel for X loop; start at left edge
+
+rectangleXloop:
+	sw $t0,($t3)
+	addiu $t3,$t3,4
+	bne $t3,$t2,rectangleXloop 	# keep going if not past the right edge of the rectangle
+
+	addu $a2,$a2,$t4 		# advace one row worth for the left edge
+	addu $t2,$t2,$t4 		# and right edge pointers
+	bne $a2,$a3,rectangleYloop 	# keep going if not off the bottom of the rectangle
+
+rectangleReturn:
+	jr $ra
