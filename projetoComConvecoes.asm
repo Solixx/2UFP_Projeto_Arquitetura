@@ -48,7 +48,7 @@ arrayPontuacao:		.space 8	# Pontuacoes (1 -> Utilizador / 2 -> PC)
 .text
 .globl main
 main:
-# $t1 -> op??o
+# $t1 -> opcao
 cicloMenu:
 	li $v0, 4
 	la $a0, Menu
@@ -71,7 +71,7 @@ cicloMenu:
 		jal fase1Main
 		j cicloMenu
 		jogoPc:
-		jal fase2Main
+		#jal fase2Main
 		j cicloMenu
 	sairPrograma:
 	j Exit
@@ -82,399 +82,81 @@ li $v0, 10
 syscall
 
 
-
-
-
 fase1Main:
-# $a0 -> endere?o do barco
+# $t0 -> endere?o do barco 	// a0
 # $s0 -> endere?o do tabuleiro
 # $s1 -> endere?o dos barcos
-# $s2 -> numero do barco
-# $t1 -> tamanho do barco
-# $t2 -> letra do Barco
+# $t1 -> numero do barco 	//s2
+# $t2 -> tamanho do barco 	// t1
+# $t3 -> letra do Barco 	//$t2
 
-la $s1, barcos
-addi $s2, $0, 1
-addi $sp, $sp, -4
+addi $sp, $sp, -12
 sw $ra, 0($sp)
+la $s0, tabuleiro
+la $s1, barcos
+sw $s0, 4($sp)
+sw $s1, 8($sp)
+addi $t1, $0, 1
 jal barcosPadra
-la $s0, tabuleiro
 jal zerarTabuleiro
-la $a0, carrier
-#lw $t2, 0($a0)
-lw $t1, 4($a0)
-#addi $t1, $0, 5
-#li $t2, 'C'
-la $s0, tabuleiro
+
+la $t0, carrier
+lw $t2, 4($t0)
+lw $s0, 4($sp)
 jal gerarTabuleiro
 
-la $s0, tabuleiro
+add $t1, $v0, $0
+lw $s1, 8($sp)
 addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, battleship
-lw $t2, 0($a0)
-lw $t1, 4($a0)
-#addi $t1, $0, 4
-#li $t2, 'B'
-la $s0, tabuleiro
+sw $s1, 8($sp)
+la $t0, battleship
+lw $t2, 4($t0)
+lw $s0, 4($sp)
 jal gerarTabuleiro
 
+lw $s1, 8($sp)
 addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, destroyer
-#lw $t2, 0($a0)
-lw $t1, 4($a0)
-#addi $t1, $0, 3
-#li $t2, 'D'
-la $s0, tabuleiro
+sw $s1, 8($sp)
+add $t1, $v0, $0
+la $t0, destroyer
+lw $t2, 4($t0)
+lw $s0, 4($sp)
 jal gerarTabuleiro
 
-la $s0, tabuleiro
+lw $s1, 8($sp)
 addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, submarine
-#lw $t2, 0($a0)
-lw $t1, 4($a0)
-#addi $t1, $0, 3
-#li $t2, 'S'
-la $s0, tabuleiro
+sw $s1, 8($sp)
+add $t1, $v0, $0
+la $t0, submarine
+lw $t2, 4($t0)
+lw $s0, 4($sp)
 jal gerarTabuleiro
 
-la $s0, tabuleiro
+lw $s1, 8($sp)
 addi $s1, $s1, 12
-add $s2, $v0, $0
-la $a0, patrol
-#lw $t2, 0($a0)
-lw $t1, 4($a0)
-#addi $t1, $0, 2
-#li $t2, 'P'
-la $s0, tabuleiro
+sw $s1, 8($sp)
+add $t1, $v0, $0
+la $t0, patrol
+lw $t2, 4($t0)
+lw $s0, 4($sp)
 jal gerarTabuleiro
 
-la $s0, tabuleiro
+lw $s0, 4($sp)
 #jal displayTabuleiro
-
 la $s1, barcos
 jal jogo
 
 lw $ra, 0($sp)
-addi $sp, $sp, 4
+addi $sp, $sp, 12
 jr $ra
 
-
-
-
-fase2Main:
-# $a0 -> endere?o do barco
-# $s0 -> endere?o do tabuleiro
-# $s1 -> endere?o dos barcos
-# $s2 -> numero do barco
-# $s3 -> endere?o dos barcosPC
-# $s4 -> contador de barcos (max 10)
-# $s5 -> I
-# $s6 -> contador da pos atual do array de barcos
-# $s7 -> endereço do array de pontuacoes
-# $t0 -> Editar tamanho de barcos ou nao (1 -> editar) / numero de barcos (menu utilizador)
-# $t1 -> tamanho do barco
-# $t2 -> letra do Barco
-# $t3 -> pontuacoes
-
-addi $sp, $sp, -20
-sw $ra, 0($sp)
-add $s4, $0, $0
-sw $s4, 4($sp)
-add $s5, $0, $0
-sw $s5, 8($sp)
-add $s6, $0, $0
-sw $s6, 12($sp)
-la $s7, arrayPontuacao
-sw $s7, 16($sp)
-# Tabuleiro Para Jogador
-
-li $v0, 4
-la $a0, editSizeBarcosMenu
-syscall
-li $v0, 5
-syscall
-add $t0, $v0, $0
-beq $t0, 1, editarSizeBarcos
-la $s1, barcosPC
-#addi $s2, $0, 1
-jal barcosPadra
-j sairBarcos
-la $s1, barcos
-jal barcosPadra
-editarSizeBarcos:
-la $s1, barcosPC
-#jal barcosEdit
-la $s1, barcos
-jal barcosEdit
-sairBarcos:
-addi $s2, $0, 1
-la $s0, tabuleiroPC
-jal zerarTabuleiro
-
-#la $s1, barcos
-#addi $s2, $0, 1
-#jal barcosPadra
-la $s0, tabuleiro
-jal zerarTabuleiro
-
-numCarrier:
-li $v0, 4
-la $a0, editNumCarrier
-syscall
-li $v0, 5
-syscall
-add $t0, $v0, $0
-lw $s5, 8($sp)
-cicloNumCarrier:
-bge $s5, $t0, numBattleship
-lw $s4, 4($sp)
-bge $s4, 10, iniciarJogoPC
-#Gerar Carrier Utilizador
-la $s1, barcos
-add $s1, $s1, $s6
-la $a0, carrier
-lw $t1, 4($a0)
-la $s0, tabuleiro
-jal gerarTabuleiro
-#Gerar Carrier PC
-la $s1, barcosPC
-add $s1, $s1, $s6
-la $a0, carrier
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
-add $s2, $v0, $0
-addi $s4, $s4, 1
-sw $s4, 4($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
-j cicloNumCarrier
-
-numBattleship:
-li $v0, 4
-la $a0, editNumBattleship
-syscall
-li $v0, 5
-syscall
-add $t0, $v0, $0
-lw $s5, 8($sp)
-cicloNumBattleship:
-bge $s5, $t0, numDestroyer
-lw $s4, 4($sp)
-bge $s4, 10, iniciarJogoPC
-la $s1, barcos
-add $s1, $s1, $s6
-#Gerar Carrier Utilizador
-la $a0, battleship
-lw $t1, 4($a0)
-la $s0, tabuleiro
-jal gerarTabuleiro
-#Gerar Carrier PC
-la $s1, barcosPC
-add $s1, $s1, $s6
-la $a0, battleship
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
-add $s2, $v0, $0
-addi $s4, $s4, 1
-sw $s4, 4($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
-j cicloNumBattleship
-
-
-numDestroyer:
-li $v0, 4
-la $a0, editNumDestroyer
-syscall
-li $v0, 5
-syscall
-add $t0, $v0, $0
-lw $s5, 8($sp)
-cicloNumDestroyer:
-bge $s5, $t0, numSubmarine
-lw $s4, 4($sp)
-bge $s4, 10, iniciarJogoPC
-la $s1, barcos
-add $s1, $s1, $s6
-#Gerar Carrier Utilizador
-la $a0, destroyer
-lw $t1, 4($a0)
-la $s0, tabuleiro
-jal gerarTabuleiro
-#Gerar Carrier PC
-la $s1, barcosPC
-add $s1, $s1, $s6
-la $a0, destroyer
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
-add $s2, $v0, $0
-addi $s4, $s4, 1
-sw $s4, 4($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
-j cicloNumDestroyer
-
-numSubmarine:
-li $v0, 4
-la $a0, editNumSubmarine
-syscall
-li $v0, 5
-syscall
-add $t0, $v0, $0
-lw $s5, 8($sp)
-cicloNumSubmarine:
-bge $s5, $t0, numPatrol
-lw $s4, 4($sp)
-bge $s4, 10, iniciarJogoPC
-la $s1, barcos
-add $s1, $s1, $s6
-#Gerar Carrier Utilizador
-la $a0, submarine
-lw $t1, 4($a0)
-la $s0, tabuleiro
-jal gerarTabuleiro
-#Gerar Carrier PC
-la $s1, barcosPC
-add $s1, $s1, $s6
-la $a0, submarine
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
-add $s2, $v0, $0
-addi $s4, $s4, 1
-sw $s4, 4($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
-j cicloNumSubmarine
-
-numPatrol:
-li $v0, 4
-la $a0, editNumPatrol
-syscall
-li $v0, 5
-syscall
-add $t0, $v0, $0
-lw $s5, 8($sp)
-cicloNumPatrol:
-bge $s5, $t0, iniciarJogoPC
-lw $s4, 4($sp)
-bge $s4, 10, iniciarJogoPC
-la $s1, barcos
-add $s1, $s1, $s6
-#Gerar Carrier Utilizador
-la $a0, patrol
-lw $t1, 4($a0)
-la $s0, tabuleiro
-jal gerarTabuleiro
-#Gerar Carrier PC
-la $s1, barcosPC
-add $s1, $s1, $s6
-la $a0, patrol
-lw $t1, 4($a0)
-la $s0, tabuleiroPC
-jal gerarTabuleiro
-add $s2, $v0, $0
-add $s2, $v0, $0
-addi $s4, $s4, 1
-sw $s4, 4($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
-j cicloNumPatrol
-
-
-# Tabuleiro Para PC
-#la $s1, barcosPC
-#addi $s2, $0, 1
-#jal barcosPadra
-#la $s0, tabuleiroPC
-#jal zerarTabuleiro
-
-#la $a0, carrier
-#lw $t1, 4($a0)
-#la $s0, tabuleiroPC
-#jal gerarTabuleiro
-
-#add $s2, $v0, $0
-#la $s0, tabuleiroPC
-#addi $s1, $s1, 12
-#la $a0, battleship
-#lw $t2, 0($a0)
-#lw $t1, 4($a0)
-#la $s0, tabuleiroPC
-#jal gerarTabuleiro
-
-#addi $s1, $s1, 12
-#add $s2, $v0, $0
-#la $a0, destroyer
-#lw $t1, 4($a0)
-#la $s0, tabuleiroPC
-#jal gerarTabuleiro
-
-#la $s0, tabuleiroPC
-#addi $s1, $s1, 12
-#add $s2, $v0, $0
-#la $a0, submarine
-#lw $t1, 4($a0)
-#la $s0, tabuleiroPC
-#jal gerarTabuleiro
-
-#la $s0, tabuleiroPC
-#addi $s1, $s1, 12
-#add $s2, $v0, $0
-#la $a0, patrol
-#lw $t1, 4($a0)
-#la $s0, tabuleiroPC
-#jal gerarTabuleiro
-
-
-iniciarJogoPC:
-la $s0, tabuleiro
-jal displayTabuleiro
-
-la $s0, tabuleiroPC
-#jal displayTabuleiro
-
-la $s1, barcos
-la $s3, barcosPC
-jal jogoPC
-
-li $v0, 4
-la $a0, pontosUtilizador
-syscall
-li $v0, 1
-lw $t3, 0($s7)
-move $a0, $t3
-syscall
-li $v0, 4
-la $a0, Enter
-syscall
-li $v0, 4
-la $a0, pontosPC
-syscall
-li $v0, 1
-lw $t3, 4($s7)
-move $a0, $t3
-syscall
-li $v0, 4
-la $a0, Enter
-syscall
-
-lw $ra, 0($sp)
-addi $sp, $sp, 20
-jr $ra
 
 
 
 jogo:
 # a0 -> endere?o dos barcos
-# $s0 -> endere?o do tabuleiro
-# $s1 -> endere?o do copiaTabuleiro
+# a1 -> endereco do tabulerio 		// s0
+# $s0 -> endere?o do copiaTabuleiro  	//s1
 # $t1 -> char coluna
 # $t2 -> numero linha
 # $t3 -> posi??o escolhida pelo utilizador final / size do barco acertado
@@ -482,12 +164,14 @@ jogo:
 # $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
 # $t6 -> contadores de barcos
 
-add $sp, $sp, -8
+add $sp, $sp, -16
 sw $ra, 0($sp)
 add $a0, $s1, $0
+add $a1, $s0, $0
+la $s0, copiaTabuleiro
 sw $a0, 4($sp)
-la $s0, tabuleiro
-la $s1, copiaTabuleiro
+sw $a1, 8($sp)
+sw $s0, 12($sp)
 jal zerarTabuleiroCopia
 cicloJogo:
 	jal displayTabuleiroJogo
@@ -507,13 +191,13 @@ cicloJogo:
 	add $t3, $t1, $t2
 	bge $t3, 400, posUtilizador
 	
-	la $s0, tabuleiro
-	la $s1, copiaTabuleiro
-	add $s1, $s1, $t3
-	lw $t4, 0($s1)
+	lw $a1, 8($sp)
+	la $t0, copiaTabuleiro
+	add $t0, $t0, $t3
+	lw $t4, 0($t0)
 	bne $t4, '-', jogadaRepetida
-		add $s0, $s0, $t3
-		lw $t4, 0($s0)
+		add $a1, $a1, $t3
+		lw $t4, 0($a1)
 		beq $t4, '-', aguaJogada
 		lw $a0, 4($sp)
 		cicloVerArrayBarco:
@@ -524,7 +208,7 @@ cicloJogo:
 			addi $t6, $t6, 1
 			sw $t6, 8($a0)
 			la $t5, 'X'
-			sw $t5, 0($s1)
+			sw $t5, 0($t0)
 			jal displayTabuleiroJogo
 			bne $t3, $t6, acertouJogada
 				li $v0, 4
@@ -540,13 +224,13 @@ cicloJogo:
 			j cicloVerArrayBarco
 		aguaJogada:
 		la $t5, '0'
-		sw $t5, 0($s1)
+		sw $t5, 0($t0)
 		jal displayTabuleiroJogo
 		li $v0, 4
 		la $a0, JogadaAgua
 		syscall
 		j posUtilizador
-		
+
 		chekarSeTodosBarcosAfundaram:
 		lw $a0, 4($sp)
 		# t4 -> barco
@@ -585,452 +269,57 @@ sairJogoDepoisDeZerar:
 add $t4, $0, $0
 sw $t4, 0($a0)
 lw $ra, 0($sp)
-add $sp, $sp, 8
-jr $ra
-
-
-
-jogoPC:
-# a0 -> endere?o dos barcos
-# a1 -> endereco dos barcosPC
-# a2 -> Pontuacoes
-# $s0 -> endere?o do tabuleiro
-# $s1 -> endere?o do copiaTabuleiro
-# $s2 -> endere?o do tabuleiroPC
-# $s3 -> endere?o do copiaTabuleiroPC
-# $s0 -> endere?o do tabuleiroPC
-# $s1 -> endere?o do copiaTabuleiroPC
-# $t1 -> char coluna
-# $t2 -> numero linha
-# $t3 -> posi??o escolhida pelo utilizador final / size do barco acertado
-# $t4 -> valores dos tabuleiros
-# $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
-# $t6 -> contadores de barcos
-# $t7 -> vez de jogar (1 -> Utilizador / 2-> PC)
-
-add $sp, $sp, -16
-sw $ra, 0($sp)
-#TODO
-add $a0, $s1, $0
-add $a2, $s7, $0
-sw $a0, 4($sp)
-add $a1, $s3, $0
-sw $a1, 8($sp)
-sw $a2, 12($sp)
-la $s0, tabuleiro
-la $s1, copiaTabuleiro
-la $s2, tabuleiroPC
-la $s3, copiaTabuleiroPC
-add $t7, $0, $0
-addi $t9, $0, -1
-jal copiarTabuleiroCopia
-jal zerarTabuleiroCopiaPC
-cicloJogoPC:
-	jal displayTabuleiroBitMap
-	jal displayTabuleiroJogoPC
-	validarVezJogada:
-	beq $t7, 2, vezPC
-	vezUtilizador:
-	li $v0, 4
-	la $a0, vezJogarUtilizador
-	syscall
-	lw $a1, 8($sp)
-	li $v0, 12
-	syscall
-	add $t1, $v0, $0
-	li $v0, 5
-	syscall
-	add $t2, $v0, $0
-	addi $t1, $t1, -97	# Passar de A -> 1, b -> 2 etc... (96 ? o valor de A)
-	bge $t1, 10, vezUtilizador
-	bge $t2, 10, vezUtilizador
-	mul $t1, $t1, 4
-	mul $t2, $t2, 40
-	add $t3, $t1, $t2
-	bge $t3, 400, vezUtilizador
-	
-	la $s2, tabuleiroPC
-	la $s3, copiaTabuleiroPC
-	add $s3, $s3, $t3
-	lw $t4, 0($s3)
-	bne $t4, '-', jogadaRepetidaUtilizador
-		add $s2, $s2, $t3
-		lw $t4, 0($s2)
-		beq $t4, '-', aguaJogadaUtilizador
-		lw $a1, 8($sp)
-		cicloVerArrayBarcoUtilizador:
-			lw $t6, 0($a1)
-			bne $t4, $t6, incrementar_a1_Utilizador
-			
-			lw $t3, 4($a1)
-			lw $t6, 8($a1)
-			addi $t6, $t6, 1
-			sw $t6, 8($a1)
-			la $t5, 'X'
-			sw $t5, 0($s3)
-			#jal displayTabuleiroJogoPC
-			bne $t3, $t6, acertouJogadaUtilizador
-				li $v0, 4
-				la $a0, JogadaAfundou
-				syscall
-			acertouJogadaUtilizador:
-			
-			div $t1, $t1, 4
-			div $t2, $t2, 40
-			mul $t1, $t1, 25
-			mul $t2, $t2, 25
-			add $t1, $t1, 260
-			#li $a0,20
-			add $a0, $0, $t1
-			li $a1,20
-			#li $a2,20
-			add $a2, $0, $t2
-			li $a3,20
-			addi $t9, $0, 16711680		# Cor vermelho
-			jal rectangle
-		
-			lw $a0, 4($sp)
-			lw $a1, 8($sp)
-			lw $a2, 12($sp)
-			
-			li $v0, 4
-			la $a0, JogadaBomba
-			syscall
-			j chekarSeTodosBarcosAfundaramUtilizador
-			incrementar_a1_Utilizador:
-			addi $a1, $a1, 12 
-			j cicloVerArrayBarcoUtilizador
-		aguaJogadaUtilizador:
-		
-		div $t1, $t1, 4
-		div $t2, $t2, 40
-		mul $t1, $t1, 25
-		mul $t2, $t2, 25
-		add $t1, $t1, 260
-		#li $a0,20
-		add $a0, $0, $t1
-		li $a1,20
-		#li $a2,20
-		add $a2, $0, $t2
-		li $a3,20
-		addi $t9, $0, 65535 	# Cor aqua
-		jal rectangle
-		
-		lw $a0, 4($sp)
-		lw $a1, 8($sp)
-		lw $a2, 12($sp)
-		
-		la $t5, '0'
-		sw $t5, 0($s3)
-		#jal displayTabuleiroJogoPC
-		li $v0, 4
-		la $a0, JogadaAgua
-		syscall
-		
-		addi $t7, $0, 2
-		j validarVezJogada
-		
-		chekarSeTodosBarcosAfundaramUtilizador:
-		lw $a1, 8($sp)
-		ciclo_chekarSeTodosBarcosAfundaramUtilizador:
-		lw $t4, 0($a1)
-		lw $t5, 4($a1)
-		lw $t6, 8($a1)
-		bne $t5, $t6, vezUtilizador
-		bge $t4, 100, vitoriaUtilizador
-		add $a1, $a1, 12
-		j ciclo_chekarSeTodosBarcosAfundaramUtilizador
-	jogadaRepetidaUtilizador:
-	li $v0, 4
-	la $a0, JogadaRepetida
-	syscall
-	j vezUtilizador
-	
-	vezPC:
-	li $v0, 4
-	la $a0, vezJogarPC
-	syscall
-	lw $a0, 4($sp)
-	#jal gerarNumeroRandom
-	jal gerarLinhaColunaRandom
-	add $t1, $v0, $0
-	jal gerarLinhaColunaRandom
-	add $t2, $v0,$0
-	bge $t1, 10, vezPC
-	bge $t2, 10, vezPC
-	mul $t1, $t1, 4
-	mul $t2, $t2, 40
-	add $t3, $t1, $t2
-	bge $t3, 400, vezPC
-	
-	la $s0, tabuleiro
-	la $s1, copiaTabuleiro
-	add $s1, $s1, $t3
-	lw $t4, 0($s1)
-	beq $t4, '0', jogadaRepetidaPC
-	beq $t4, 'X', jogadaRepetidaPC
-		add $s0, $s0, $t3
-		lw $t4, 0($s0)
-		beq $t4, '-', aguaJogadaPC
-		lw $a0, 4($sp)
-		cicloVerArrayBarcoPC:
-			lw $t6, 0($a0)
-			bne $t4, $t6, incrementar_a0_PC
-			lw $t3, 4($a0)
-			lw $t6, 8($a0)
-			addi $t6, $t6, 1
-			sw $t6, 8($a0)
-			la $t5, 'X'
-			sw $t5, 0($s1)
-			#jal displayTabuleiroJogo
-			
-			div $t1, $t1, 4
-			div $t2, $t2, 40
-			mul $t1, $t1, 25
-			mul $t2, $t2, 25
-			#li $a0,20
-			add $a0, $0, $t1
-			li $a1,20
-			#li $a2,20
-			add $a2, $0, $t2
-			li $a3,20
-			addi $t9, $0, 16711680		# Cor vermelho
-			jal rectangle
-		
-			lw $a0, 4($sp)
-			lw $a1, 8($sp)
-			lw $a2, 12($sp)
-			
-			j chekarSeTodosBarcosAfundaramPC
-			incrementar_a0_PC:
-			addi $a0, $a0, 12
-			j cicloVerArrayBarcoPC
-		aguaJogadaPC:
-		
-		div $t1, $t1, 4
-		div $t2, $t2, 40
-		mul $t1, $t1, 25
-		mul $t2, $t2, 25
-		#li $a0,20
-		add $a0, $0, $t1
-		li $a1,20
-		#li $a2,20
-		add $a2, $0, $t2
-		li $a3,20
-		addi $t9, $0, 65535 	# Cor aqua
-		jal rectangle
-		
-		lw $a0, 4($sp)
-		lw $a1, 8($sp)
-		lw $a2, 12($sp)
-		
-		la $t5, '0'
-		sw $t5, 0($s1)
-		#jal displayTabuleiroJogo
-		addi $t7, $0, 1
-		j validarVezJogada
-		
-		chekarSeTodosBarcosAfundaramPC:
-		lw $a0, 4($sp)
-		ciclo_chekarSeTodosBarcosAfundaramPC:
-		lw $t4, 0($a0)
-		lw $t5, 4($a0)
-		lw $t6, 8($a0)
-		bne $t5, $t6, vezPC
-		bge $t4, 100, vitoriaPC
-		add $a0, $a0, 12
-		j ciclo_chekarSeTodosBarcosAfundaramPC
-	jogadaRepetidaPC:
-	j vezPC
-j cicloJogoPC
-
-vitoriaUtilizador:
-lw $a0, 4($sp)
-lw $a1, 8($sp)
-lw $a2, 12($sp)
-
-lw $t5, 0($a2)
-addi $t4, $t5, 5
-sw $t4, 0($a2)
-lw $t5, 4($a2)
-addi $t4, $t5, -3
-blt $t4, 0, igualarDerrotaPC0
-sw $t4, 4($a2)
-j sairJogoPC
-igualarDerrotaPC0:
-add $t4, $0, $0
-sw $t4, 4($a2)
-j sairJogoPC
-
-vitoriaPC:
-lw $a0, 4($sp)
-lw $a1, 8($sp)
-lw $a2, 12($sp)
-
-lw $t5, 4($a2)
-addi $t4, $t5, 5
-sw $t4, 4($a2)
-lw $t5, 0($a2)
-addi $t4, $t5, -3
-blt $t4, 0, igualarDerrotaUtilizador0
-sw $t4, 0($a2)
-j sairJogoPC
-igualarDerrotaUtilizador0:
-add $t4, $0, $0
-sw $t4, 0($a2)
-j sairJogoPC
-
-
-sairJogoPC:
-zerarArrayBarcosPC:
-lw $a0, 4($sp)
-ciclo_zerarArrayBarcosPC:
-lw $t4, 0($a0)
-bge $t4, 100, zerarArrayBarcosUtilizador
-add $t4, $0, $0
-sw $t4, 0($a0)
-add $a0, $a0, 12
-j ciclo_zerarArrayBarcosPC
-
-zerarArrayBarcosUtilizador:
-lw $a1, 4($sp)
-ciclo_zerarArrayBarcosUtilizador:
-lw $t4, 0($a1)
-bge $t4, 100, sairJogoDepoisDeZerarPC
-add $t4, $0, $0
-sw $t4, 0($a1)
-add $a1, $a1, 12
-j ciclo_zerarArrayBarcosUtilizador
-
-sairJogoDepoisDeZerarPC:
-add $t4, $0, $0
-sw $t4, 0($a0)
-sw $t4, 0($a1)
-#TODO
-lw $ra, 0($sp)
 add $sp, $sp, 16
 jr $ra
 
-copiarTabuleiroCopia:
-#t1 -> i
-#t2 -> '0'
-
-la $a0, copiaTabuleiro
-la $a1, tabuleiro
-add $t1, $0, $0
-#li $t2, '-'
-copiar_tabuleiroCopia_for:
-	lw $t2, 0($a1)
-	bge $t1, 100, sair_copiar_tabuleiroCopia_for		# i >= 100 sai do ciclo
-	sw $t2, 0($a0)
-	addi $a0, $a0, 4
-	addi $a1, $a1, 4
-	addi $t1, $t1, 1
-	j copiar_tabuleiroCopia_for
-sair_copiar_tabuleiroCopia_for:
-jr $ra
-
-zerarTabuleiroCopia:
-#t1 -> i
-#t2 -> '0'
-
-la $a0, copiaTabuleiro
-add $t1, $0, $0
-li $t2, '-'
-zerar_tabuleiroCopia_for:
-	bge $t1, 100, sair_zerar_tabuleiroCopia_for		# i >= 100 sai do ciclo
-	sw $t2, 0($a0)
-	addi $a0, $a0, 4
-	addi $t1, $t1, 1
-	j zerar_tabuleiroCopia_for
-sair_zerar_tabuleiroCopia_for:
-jr $ra
-
-zerarTabuleiroCopiaPC:
-#t1 -> i
-#t2 -> '0'
-
-la $a0, copiaTabuleiroPC
-add $t1, $0, $0
-li $t2, '-'
-zerar_tabuleiroCopiaPC_for:
-	bge $t1, 100, sair_zerar_tabuleiroCopiaPC_for		# i >= 100 sai do ciclo
-	sw $t2, 0($a0)
-	addi $a0, $a0, 4
-	addi $t1, $t1, 1
-	j zerar_tabuleiroCopiaPC_for
-sair_zerar_tabuleiroCopiaPC_for:
-jr $ra
 
 
-
-displayTabuleiroBitMap:
+displayTabuleiro:
 #a0 -> tabuleiro
-#t7 -> i
+#t9 -> i
 #t8 -> j
-#t5 -> X
 #t4 -> val do endere?o
-#t6 -> Y
-#t9 -> cor
+# t5 -> pos atual
 add $sp, $sp, -4
-sw $ra, 0($sp)
-la $s0, copiaTabuleiroPC
-la $s1, copiaTabuleiro
-addi $t5, $0, 0
-add $t7, $0, $0
-addi $t6, $0, 0
-addi $t9, $0, -1
-displayTabuleiroBitMap_1for:
-	bge $t7, 10, sair_displayTabuleiroBitMap_1for		# i >= 10 sai do ciclo
+add $a0, $s0, $0
+sw $a0, 0($sp)
+add $t9, $0, $0
+add $t5, $0, $0
+displayTabuleiro_1for:
+	bge $t9, 10, sair_displayTabuleiro_1for		# i >= 10 sai do ciclo
 	add $t8, $0, $0
-	displayTabuleiroBitMap_2for:
-		bge $t8, 10, sair_displayTabuleiroBitMap_2for		# j >= 10 sai do ciclo
-		lw $t4, 0($s1)
-		#li $a0,100
-		add $a0, $0, $t5
-		li $a1,20
-		#li $a2,200
-		add $a2, $0, $t6
-		li $a3,20
-		bne $t4, '-', bitMapComBarco
-		jal rectangle
-		j bitMapPc
-		bitMapComBarco:
-		addi $t9, $0, 200
-		jal rectangle
-		addi $t9, $0, -1
-		j bitMapPc
-
-		bitMapPc:
-		add $t5, $t5, 260
-		lw $t4, 0($s0)
-		#li $a0,100
-		add $a0, $0, $t5
-		li $a1,20
-		#li $a2,200
-		add $a2, $0, $t6
-		li $a3,20
-		add $t5, $t5, -260
-		jal rectangle
-		
-		addi $s0, $s0, 4
-		addi $s1, $s1, 4
-		add $t5, $t5, 25
+	displayTabuleiro_2for:
+		bge $t8, 10, sair_displayTabuleiro_2for		# j >= 10 sai do ciclo
+		lw $t4, 0($a0)
+		beq $t4, '-', printString
+		li $v0, 1
+		move $a0, $t4
+		syscall
+		j increment_displayTabuleiro_2for
+		printString:
+		li $v0, 4
+		sw $t4, valTabuleiro
+		la $a0, valTabuleiro
+		syscall
+		j increment_displayTabuleiro_2for
+		increment_displayTabuleiro_2for:
+		addi $t5, $t5, 4
+		lw $a0, 0($sp)
+		add $a0, $a0, $t5
 		addi $t8, $t8, 1
-		j displayTabuleiroBitMap_2for
-	sair_displayTabuleiroBitMap_2for:
-	#li $v0, 4
-	#la $a0, Enter
-	#syscall
-	addi $t5, $0, 0
-	add $t6, $t6, 25
-	addi $t7, $t7, 1
-	j displayTabuleiroBitMap_1for
-sair_displayTabuleiroBitMap_1for:
-#li $v0, 4
-#la $a0, Enter
-#syscall
-lw $ra, 0($sp)
+		j displayTabuleiro_2for
+	sair_displayTabuleiro_2for:
+	li $v0, 4
+	la $a0, Enter
+	syscall
+	lw $a0, 0($sp)
+	add $a0, $a0, $t5
+	addi $t9, $t9, 1
+	j displayTabuleiro_1for
+sair_displayTabuleiro_1for:
+li $v0, 4
+la $a0, Enter
+syscall
 add $sp, $sp, 4
 jr $ra
 
@@ -1041,17 +330,16 @@ displayTabuleiroJogo:
 #t3 -> endere?o
 #t4 -> val do endere?o
 # $t5 -> valor da posicao do array tabuleiro
+
+add $sp, $sp, -4
 la $s0, copiaTabuleiro
-#add $t3, $0, $0
+sw $s0, 0($sp)
 add $t1, $0, $0
-#add $t3, $a0, $0
 displayTabuleiroJogo_1for:
 	bge $t1, 10, sair_displayTabuleiroJogo_1for		# i >= 10 sai do ciclo
 	add $t2, $0, $0
 	displayTabuleiroJogo_2for:
 		bge $t2, 10, sair_displayTabuleiroJogo_2for		# j >= 10 sai do ciclo
-		#add $s0, $t3, $0
-		#add $t3, $a0, $0
 		lw $t4, 0($s0)
 		beq $t4, '-', printStringJogo
 		beq $t4, '0', printStringJogo
@@ -1059,73 +347,57 @@ displayTabuleiroJogo_1for:
 		li $v0, 1
 		move $a0, $t4
 		syscall
+		lw $s0, 0($sp)
 		j incrementarS0
 		printStringJogo:
 		li $v0, 4
 		sw $t4, valCopiaTabuleiro
 		la $a0, valCopiaTabuleiro
 		syscall
-		#add $t3, $t3, 4
+		lw $s0, 0($sp)
 		incrementarS0:
 		addi $s0, $s0, 4
+		sw $s0, 0($sp)
 		addi $t2, $t2, 1
 		j displayTabuleiroJogo_2for
 	sair_displayTabuleiroJogo_2for:
 	li $v0, 4
 	la $a0, Enter
 	syscall
+	lw $s0, 0($sp)
 	addi $t1, $t1, 1
 	j displayTabuleiroJogo_1for
 sair_displayTabuleiroJogo_1for:
 li $v0, 4
 la $a0, Enter
 syscall
+add $sp, $sp, 4
 jr $ra
 
-displayTabuleiroJogoPC:
-#a0 -> tabuleiro
-#t1 -> i
-#t2 -> j
-#t3 -> endere?o
-#t4 -> val do endere?o
-la $s0, copiaTabuleiroPC
-#add $t3, $0, $0
-add $t1, $0, $0
-#add $t3, $a0, $0
-displayTabuleiroJogoPC_1for:
-	bge $t1, 10, sair_displayTabuleiroJogoPC_1for		# i >= 10 sai do ciclo
-	add $t2, $0, $0
-	displayTabuleiroJogoPC_2for:
-		bge $t2, 10, sair_displayTabuleiroJogoPC_2for		# j >= 10 sai do ciclo
-		#add $s0, $t3, $0
-		#add $t3, $a0, $0
-		li $v0, 4
-		lw $t4, 0($s0)
-		sw $t4, valCopiaTabuleiro
-		la $a0, valCopiaTabuleiro
-		syscall
-		#add $t3, $t3, 4
-		addi $s0, $s0, 4
-		addi $t2, $t2, 1
-		j displayTabuleiroJogoPC_2for
-	sair_displayTabuleiroJogoPC_2for:
-	li $v0, 4
-	la $a0, Enter
-	syscall
-	addi $t1, $t1, 1
-	j displayTabuleiroJogoPC_1for
-sair_displayTabuleiroJogoPC_1for:
-li $v0, 4
-la $a0, Enter
-syscall
+zerarTabuleiroCopia:
+# a0 -> endereco de copiaTabuleiro
+#t9 -> i
+#t2 -> '0'
+
+#la $a0, copiaTabuleiro
+add $a0, $s0, $0
+add $t9, $0, $0
+li $t2, '-'
+zerar_tabuleiroCopia_for:
+	bge $t9, 100, sair_zerar_tabuleiroCopia_for		# i >= 100 sai do ciclo
+	sw $t2, 0($a0)
+	addi $a0, $a0, 4
+	addi $t9, $t9, 1
+	j zerar_tabuleiroCopia_for
+sair_zerar_tabuleiroCopia_for:
 jr $ra
+
 
 gerarTabuleiro:
-# a0 -> Size do Barco
-# a1 -> Numero do Barco
+# $a0 -> Size do Barco
+# $a1 -> Numero do Barco
 # $a2 -> array dos barcos
-# $s0 -> tabuleiro
-# $t8 -> Pois??es das Pe?as do Barco
+# $t8 -> Posicoes das Pecas do Barco
 # $t1 -> posi??o do barco antes de chackar se vazia / posi??o do barco para add Letra
 # $t2 -> Valor na Pos do tabuleiro
 # $t3 -> Axis (Horizontal = 0 / Vertical = 1)
@@ -1137,15 +409,14 @@ gerarTabuleiro:
 
 add $sp, $sp, -20	# Baixar a Stack
 sw $ra, 0($sp)		# Guardar o $ra desta fun??o
-add $a0, $t1, $0	# Guardar o Size do Barco em $a0
-add $a1, $s2, $0	# Guardar a Numero do Barco em $a1
-add $a2, $s1, $0	# Array dos barcos
-sw $a0, 4($sp)		# Guardo o Size do Barco na stack pq vou perder o valor de $a0 noutras fun??es
-sw $a1, 8($sp)		# Guardo a Letra do Barco na stack pq vou perder o valor de $a1 noutras fun??es
-sw $a2, 12($sp)		# Guardo a Letra do Barco na stack pq vou perder o valor de $a1 noutras fun??es
+add $a0, $t2, $0	# Guardar o Size do Barco em $a0
+add $a1, $t1, $0	# Guardar a Numero do Barco em $a1
+add $a2, $s1, $0	# Endereco do barco
 add $a3, $s0, $0	# Endereco do tabuleiro
+sw $a0, 4($sp)		# Guardo o Size do Barco na stack pq vou perder o valor de $a0 noutras funcoes
+sw $a1, 8($sp)		# Guardo a Numero do Barco na stack pq vou perder o valor de $a1 noutras funcoes
+sw $a2, 12($sp)		# Guardo a Enderco do Barco na stack pq vou perder o valor de $a1 noutras funcoes
 sw $a3, 16($sp)		# Guardar o endereco do tauleiro na stack
-#la $s0, tabuleiro	# Guardar o endere?o do tabuleiro em $s0
 la $t8, arrayDePos	# Guardar o endere?o do arrayDePos em $t8
 gerarPos:
 	add $t1, $0, $0
@@ -1156,8 +427,7 @@ gerarPos:
 	add $t6, $0, $0
 	add $t7, $0, $0
 	jal gerarAxRandom		# Fun??o que gera Numero entre 0 < 2
-	add $t3, $v0, $0		# Guarda o valor que vai ser usado para saber em que dire??o adicionar as pe?as do barco
-	#addi $t3, $0, 0
+	add $t3, $v0, $0		# Guarda o valor que vai ser usado para saber em que direcao adicionar as pecas do barco
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
 	lw $a3, 16($sp)
 	beq $t3, 0, validacoesHor
@@ -1168,32 +438,25 @@ gerarPos:
 		sub $t4, $t4, $t5		# 100 - ((Size do barco-1) * 10) / Usado para saber o limite do numero gerado na fun??o gerarNumeroRandomVert (tabuleiro sem ser multiplicado por 4 / 0-100)
 		jal gerarNumeroRandomVert	# Fun??o que gera Numero entre 0 < 60
 		add $t1, $v0, $0		# Guarda a primeira posi??op gerada pela fun??o "gerarNumeroRandom"
-		#addi $t1, $0, 0
-		
+
 		jal validarCima		# Chama fun??o que vai validar se vou precisar validar a linha de cima
 		add $t6, $v0, $0		# recebe o valor da fun??o
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-		#lw $a3, 16($sp)
 		j sairValidarCimaBaixo		# se $t6 = 1 ent?o estou na primeira linha e n?o preciso de fazer "validarLinhaBaixo"
 		
 		jal validarBaixo
 		add $t6, $v0, $0
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-		#lw $a3, 16($sp)
 		
 		sairValidarCimaBaixo:
 		mul $t1, $t1, 4			# Multiplicar essa posi??o para ser usada nos arrays
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-		#lw $a3, 16($sp)
-		
 	j sair_validacoes
 	validacoesHor:
 		jal gerarNumeroRandom		# Fun??o que gera Numero entre 0 < 100
 		add $t1, $v0, $0		# Guarda a primeira posi??op gerada pela fun??o "gerarNumeroRandom"
-		#addi $t1, $0, 0
 		mul $t1, $t1, 4			# Multiplicar essa posi??o para ser usada nos arrays
 		lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-		#lw $a3, 16($sp)
 		mul $t5, $a0, 4			# Size do barco * 4
 		Hor_t1_entre_0_36:		# Testes na primeira linha
 		bge $t1, 40, Hor_t1_entre_40_76		# if($t1 >= 40) vai para o teste da 2? linha
@@ -1269,87 +532,64 @@ gerarPos:
 			j sair_validacoes
 			
 	sair_validacoes:
-	#la $s0, tabuleiro		# Voltar a meter o valor do endere?o do tabuleiro em $a0 pois foi perdido na fun??o anterior "gerarNumeroRandom"
-	#lw $a3, 16($sp)
 	add $a3, $a3, $t1		# Meter $a3 na posi??o gerada aleat?riamente
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-	#lw $a3, 16($sp)
 	
 	jal validacoesEsquerda		# chama a fun??o que valida se vou ter de validar o lado esquerdo da posi??o
 	add $t7, $v0, $0
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-	#lw $a3, 16($sp)
 	beq $t7, 1, validacoesPosicoes	# Se $t7 = 1 quer dizer q n vou validar ? esquerda ent n?o preciso de ver a "validacoesDireita"
 	
 	jal validacoesDireita		# chama a fun??o que valida se vou ter de validar o lado esquerdo da posi??o
 	add $t7, $v0, $0
 	lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-	#lw $a3, 16($sp)
 	
 	validacoesPosicoes:
 	lw $t4, 0($a3)			# Recebe o valor do tabuleiro
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos
 	bne $t4, '-', gerarPos
 	j mainTeste1			# else salta para o prox teste
 	mainTeste1:
 	beq $t6, 1, mainTeste2		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 	lw $t4, -40($a3)		# recebe o valor da linha de cima do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos	
 	bne $t4, '-', gerarPos
 	j mainTeste2			# else salta para o prox teste
 	mainTeste2:
 	beq $t6, 1, mainTeste3		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 	beq $t7, 2, mainTeste3		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 	lw $t4, -36($a3)		# recebe o valor da diagonal cima ? direita de cima do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos
 	bne $t4, '-', gerarPos
 	j mainTeste3			# else salta para o prox teste
 	mainTeste3:
 	beq $t7, 2, mainTeste4		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 	lw $t4, 4($a3)			# recebe o valor da direita do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos
 	bne $t4, '-', gerarPos
 	j mainTeste4			# else salta para o prox teste
 	mainTeste4:
 	beq $t6, 2, mainTeste5		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 	beq $t7, 2, mainTeste5		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 	lw $t4, 44($a3)			# recebe o valor da diagonal baixo ? direita do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos	
 	bne $t4, '-', gerarPos
 	j mainTeste5			# else salta para o prox teste
 	mainTeste5:
 	beq $t6, 2, mainTeste6		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 	lw $t4, 40($a3)			# recebe o valor da linha de baixo do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos	
 	bne $t4, '-', gerarPos
 	j mainTeste6			# else salta para o prox teste
 	mainTeste6:
 	beq $t6, 2, mainTeste7		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 	beq $t7, 1, mainTeste7		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 	lw $t4, 36($a3)			# recebe o valor da diagonal baixo ? esquerda do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos
 	bne $t4, '-', gerarPos
 	j mainTeste7			# else salta para o prox teste
 	mainTeste7:
 	beq $t7, 1, mainTeste8		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 	lw $t4, -4($a3)			# recebe o valor da esquerda do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos	
 	bne $t4, '-', gerarPos
 	j mainTeste8			# else salta para o prox teste
 	mainTeste8:
 	beq $t6, 1, sairTeste		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 	beq $t7, 1, sairTeste		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 	lw $t4, -44($a3)		# recebe o valor da diagonal de cima ? esquerda do tabulerio
-	#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-	#bne $t4, 0, gerarPos	
 	bne $t4, '-', gerarPos
 	j sairTeste			# else salta para o prox teste
 	
@@ -1358,8 +598,6 @@ gerarPos:
 	forSizeBarco:
 		beq $t9, $a0, breakForSizeBarco	# If(I < Size) SAI -> breakForSizeBarco
 		lw $t2, 0($a3)			# Recebe o valor dessa posi??o em $t2
-		#bne $t2, '0', gerarPos		# If($t2 != '0') SAI -> gerarPos
-		#bne $t2, 0, gerarPos	
 		bne $t2, '-', gerarPos	
 		beq $t3, 0, fazHorizontal	# If($t3 == 0) ($t2 = 0 -> Horizontal / $t2 = 1 -> Vertical)
 		fazVertical:
@@ -1370,65 +608,48 @@ gerarPos:
 			jal validarBaixo
 			add $t6, $v0, $0
 			lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-			#lw $a3, 16($sp)
 			
 			validacoesPosicoesVert:
 			lw $t4, 0($a3)			# Recebe o valor do tabuleiro
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j vertTeste1			# else salta para o prox teste
 			vertTeste1:
 			beq $t6, 1, vertTeste2		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			beq $t7, 2, vertTeste2		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, -36($a3)		# recebe o valor da diagonal cima ? direita de cima do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j vertTeste2			# else salta para o prox teste
 			vertTeste2:
 			beq $t7, 2, vertTeste3		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, 4($a3)			# recebe o valor da direita do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j vertTeste3			# else salta para o prox teste
 			vertTeste3:
 			beq $t6, 2, vertTeste4		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 			beq $t7, 2, vertTeste4		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, 44($a3)			# recebe o valor da diagonal baixo ? direita do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos
 			bne $t4, '-', gerarPos
 			j vertTeste4			# else salta para o prox teste
 			vertTeste4:
 			beq $t6, 2, vertTeste5		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 			lw $t4, 40($a3)			# recebe o valor da linha de baixo do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos
 			bne $t4, '-', gerarPos
 			j vertTeste5			# else salta para o prox teste
 			vertTeste5:
 			beq $t6, 2, vertTeste6		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 			beq $t7, 1, vertTeste6		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			lw $t4, 36($a3)			# recebe o valor da diagonal baixo ? esquerda do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j vertTeste6			# else salta para o prox teste
 			vertTeste6:
 			beq $t7, 1, vertTeste7		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, -4($a3)			# recebe o valor da esquerda do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j vertTeste7			# else salta para o prox teste
 			vertTeste7:
 			beq $t6, 1, sairTesteVert	# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			beq $t7, 1, sairTesteVert	# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			lw $t4, -44($a3)		# recebe o valor da diagonal de cima ? esquerda do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j sairTesteVert			# else salta para o prox teste
 			
@@ -1442,65 +663,48 @@ gerarPos:
 			jal validacoesDireita		# chama a fun??o que valida se vou ter de validar o lado esquerdo da posi??o
 			add $t7, $v0, $0
 			lw $a0, 4($sp)			# Receber o size do barco pela stack (pois perco o valor do $a0 noutras fun??es)
-			#lw $a3, 16($sp)
 			
 			validacoesPosicoesHor:
 			lw $t4, 0($a3)			# Recebe o valor do tabuleiro
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos
 			bne $t4, '-', gerarPos
 			j horTeste1			# else salta para o prox teste
 			horTeste1:
 			beq $t6, 1, horTeste2		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			lw $t4, -40($a3)		# recebe o valor da linha de cima do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j horTeste2			# else salta para o prox teste
 			horTeste2:
 			beq $t6, 1, horTeste3		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			beq $t7, 2, horTeste3		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, -36($a3)		# recebe o valor da diagonal cima ? direita de cima do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos
 			bne $t4, '-', gerarPos
 			j horTeste3			# else salta para o prox teste
 			horTeste3:
 			beq $t7, 2, horTeste4		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, 4($a3)			# recebe o valor da direita do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos
 			bne $t4, '-', gerarPos
 			j horTeste4			# else salta para o prox teste
 			horTeste4:
 			beq $t6, 2, horTeste5		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 			beq $t7, 2, horTeste5		# Se $t6 = 1 n?o ? para validar coluna da esquerda ent?o dou skip a esta valida??o
 			lw $t4, 44($a3)			# recebe o valor da diagonal baixo ? direita do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j horTeste5			# else salta para o prox teste
 			horTeste5:
 			beq $t6, 2, horTeste6		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 			lw $t4, 40($a3)			# recebe o valor da linha de baixo do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j horTeste6			# else salta para o prox teste
 			horTeste6:
 			beq $t6, 2, horTeste7		# Se $t6 = 2 n?o ? para validar linha de baixo ent?o dou skip a esta valida??o
 			beq $t7, 1, horTeste7		# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			lw $t4, 36($a3)			# recebe o valor da diagonal baixo ? esquerda do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos	
 			bne $t4, '-', gerarPos
 			j horTeste7			# else salta para o prox teste
 			horTeste7:
 			beq $t6, 1, sairTesteHor	# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			beq $t7, 1, sairTesteHor	# Se $t6 = 1 n?o ? para validar linha de cima ent?o dou skip a esta valida??o
 			lw $t4, -44($a3)		# recebe o valor da diagonal de cima ? esquerda do tabulerio
-			#bne $t4, '0', gerarPos		# if($t4 != '0') vai para gerarPos
-			#bne $t4, 0, gerarPos
 			bne $t4, '-', gerarPos
 			j sairTesteHor			# else salta para o prox teste
 			
@@ -1519,7 +723,6 @@ forAddBarco:
 	beq $t9, $a0, addBarcoArrayBarcos	# If(I < Size) SAI -> breakForSizeBarco
 	addi $t8, $t8, -4			# Baixa as posi??es do vetor de $t8(posi??es das pe?as do barco)
 	lw $t1, 0($t8)				# Recebe o valor de $t8(posi??es do tabuleiro) para $t1	
-	#la $s0, tabuleiro
 	lw $a3, 16($sp)
 	add $a3, $a3, $t1			# Anda no tabuleiro para as v?rias posi??es
 	sw $a1, 0($a3)				# Guarda o valor de $a1(letra do barco) na posi??o $a3(tabuleiro)
@@ -1546,46 +749,29 @@ jr $ra
 
 
 
-barcosPadra:
-# $s0 -> endere?o do barco
-# $t1 -> valores
-carrierBarcoPadrao:
-la $s0, carrier
-la $t1, 'C'
-sw $t1, 0($s0)
-addi $t1, $0, 5
-sw $t1, 4($s0)
-battleshipBarcoPadrao:
-la $s0, battleship
-la $t1, 'B'
-sw $t1, 0($s0)
-addi $t1, $0, 4
-sw $t1, 4($s0)
-destroyerBarcoPadrao:
-la $s0, destroyer
-la $t1, 'D'
-sw $t1, 0($s0)
-addi $t1, $0, 3
-sw $t1, 4($s0)
-submarineBarcoPadrao:
-la $s0, submarine
-la $t1, 'S'
-sw $t1, 0($s0)
-addi $t1, $0, 3
-sw $t1, 4($s0)
-patrolBarcoPadrao:
-la $s0, patrol
-la $t1, 'P'
-sw $t1, 0($s0)
-addi $t1, $0, 2
-sw $t1, 4($s0)
+
+zerarTabuleiro:
+# $a0 -> endere?o tabuleiro
+#t9 -> i
+#t2 -> '0'
+
+#la $a0, tabuleiro
+add $a0, $s0, $0
+add $t9, $0, $0
+li $t2, '-'
+zerar_tabuleiro_for:
+	bge $t9, 100, sair_zerar_tabuleiro_for		# i >= 100 sai do ciclo
+	sw $t2, 0($a0)
+	addi $a0, $a0, 4
+	addi $t9, $t9, 1
+	j zerar_tabuleiro_for
+sair_zerar_tabuleiro_for:
 jr $ra
 
 
-
 barcosEdit:
-# $s0 -> endere?o do barco
-# $t0 -> tamanho do barco
+# $t0 -> endere?o do barco	//s0
+# $t2 -> tamanho do barco	//t0
 # $t1 -> valores
 
 li $v0, 4
@@ -1599,19 +785,19 @@ la $a0, barcoCarrier
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
+add $t2, $v0, $0
 
 carrierBarcoEdit:
-la $s0, carrier
+la $t0, carrier
 la $t1, 'C'
-sw $t1, 0($s0)
-ble $t0, 0, tamanhoPadraoCarrier
-add $t1, $0, $t0
+sw $t1, 0($t0)
+ble $t2, 0, tamanhoPadraoCarrier
+add $t1, $0, $t2
 j skipEditCarrier
 tamanhoPadraoCarrier:
 addi $t1, $0, 5
 skipEditCarrier:
-sw $t1, 4($s0)
+sw $t1, 4($t0)
 
 li $v0, 4
 la $a0, editSizeBarco
@@ -1621,19 +807,19 @@ la $a0, barcoBattleship
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
+add $t2, $v0, $0
 
 battleshipBarcoEdit:
-la $s0, battleship
+la $t0, battleship
 la $t1, 'B'
-sw $t1, 0($s0)
-ble $t0, 0, tamanhoPadraoBattleship
-add $t1, $0, $t0
+sw $t1, 0($t0)
+ble $t2, 0, tamanhoPadraoBattleship
+add $t1, $0, $t2
 j skipEditBattleship
 tamanhoPadraoBattleship:
 addi $t1, $0, 4
 skipEditBattleship:
-sw $t1, 4($s0)
+sw $t1, 4($t0)
 
 li $v0, 4
 la $a0, editSizeBarco
@@ -1643,19 +829,19 @@ la $a0, barcoDestroyer
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
+add $t2, $v0, $0
 
 destroyerBarcoEdit:
-la $s0, destroyer
+la $t0, destroyer
 la $t1, 'D'
-sw $t1, 0($s0)
-ble $t0, 0, tamanhoPadraoDestroyer
-add $t1, $0, $t0
+sw $t1, 0($t0)
+ble $t2, 0, tamanhoPadraoDestroyer
+add $t1, $0, $t2
 j skipEditDestroyer
 tamanhoPadraoDestroyer:
 addi $t1, $0, 3
 skipEditDestroyer:
-sw $t1, 4($s0)
+sw $t1, 4($t0)
 
 li $v0, 4
 la $a0, editSizeBarco
@@ -1665,19 +851,19 @@ la $a0, barcoSubmarine
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
+add $t2, $v0, $0
 
 submarineBarcoEdit:
-la $s0, submarine
+la $t0, submarine
 la $t1, 'S'
-sw $t1, 0($s0)
-ble $t0, 0, tamanhoPadraoSubmarine
-add $t1, $0, $t0
+sw $t1, 0($t0)
+ble $t2, 0, tamanhoPadraoSubmarine
+add $t1, $0, $t2
 j skipEditSubmarine
 tamanhoPadraoSubmarine:
 addi $t1, $0, 3
 skipEditSubmarine:
-sw $t1, 4($s0)
+sw $t1, 4($t0)
 
 li $v0, 4
 la $a0, editSizeBarco
@@ -1687,20 +873,57 @@ la $a0, barcoPatrol
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
+add $t2, $v0, $0
 
 patrolBarcoEdit:
-la $s0, patrol
+la $t0, patrol
 la $t1, 'P'
-sw $t1, 0($s0)
-ble $t0, 0, tamanhoPadraoPatrol
-add $t1, $0, $t0
+sw $t1, 0($t0)
+ble $t2, 0, tamanhoPadraoPatrol
+add $t1, $0, $t2
 j skipEditPatrol
 tamanhoPadraoPatrol:
 addi $t1, $0, 2
 skipEditPatrol:
-sw $t1, 4($s0)
+sw $t1, 4($t0)
 jr $ra
+
+
+barcosPadra:
+# $t0 -> endere?o do barco
+# $t9 -> valores
+carrierBarcoPadrao:
+la $t0, carrier
+la $t9, 'C'
+sw $t9, 0($t0)
+addi $t9, $0, 5
+sw $t9, 4($t0)
+battleshipBarcoPadrao:
+la $t0, battleship
+la $t9, 'B'
+sw $t9, 0($t0)
+addi $t9, $0, 4
+sw $t9, 4($t0)
+destroyerBarcoPadrao:
+la $t0, destroyer
+la $t9, 'D'
+sw $t9, 0($t0)
+addi $t9, $0, 3
+sw $t9, 4($t0)
+submarineBarcoPadrao:
+la $t0, submarine
+la $t9, 'S'
+sw $t9, 0($t0)
+addi $t9, $0, 3
+sw $t9, 4($t0)
+patrolBarcoPadrao:
+la $t0, patrol
+la $t9, 'P'
+sw $t9, 0($t0)
+addi $t9, $0, 2
+sw $t9, 4($t0)
+jr $ra
+
 
 
 gerarLinhaColunaRandom:
@@ -1736,84 +959,6 @@ add $a0, $a0, 0 #valor minimo do numero aleatorio
 add $v0, $a0, $0
 jr $ra
 
-
-zerarTabuleiro:
-# $a0 -> endere?o tabuleiro
-#t1 -> i
-#t2 -> '0'
-
-#la $a0, tabuleiro
-add $a0, $s0, $0
-add $t1, $0, $0
-li $t2, '-'
-zerar_tabuleiro_for:
-	bge $t1, 100, sair_zerar_tabuleiro_for		# i >= 100 sai do ciclo
-	sw $t2, 0($a0)
-	addi $a0, $a0, 4
-	addi $t1, $t1, 1
-	j zerar_tabuleiro_for
-sair_zerar_tabuleiro_for:
-jr $ra
-
-
-displayTabuleiro:
-#a0 -> tabuleiro
-#t1 -> i
-#t2 -> j
-#t3 -> endere?o
-#t4 -> val do endere?o
-# t5 -> pos atual
-add $sp, $sp, -4
-add $a0, $s0, $0
-sw $a0, 0($sp)
-#la $s0, tabuleiro
-#add $t3, $0, $0
-add $t1, $0, $0
-add $t5, $0, $0
-#add $t3, $a0, $0
-displayTabuleiro_1for:
-	bge $t1, 10, sair_displayTabuleiro_1for		# i >= 10 sai do ciclo
-	add $t2, $0, $0
-	displayTabuleiro_2for:
-		bge $t2, 10, sair_displayTabuleiro_2for		# j >= 10 sai do ciclo
-		#add $s0, $t3, $0
-		#add $t3, $a0, $0
-		#li $v0, 4
-		lw $t4, 0($a0)
-		beq $t4, '-', printString
-		li $v0, 1
-		move $a0, $t4
-		syscall
-		j increment_displayTabuleiro_2for
-		printString:
-		li $v0, 4
-		sw $t4, valTabuleiro
-		la $a0, valTabuleiro
-		#move $a0, $t4
-		syscall
-		j increment_displayTabuleiro_2for
-		#add $t3, $t3, 4
-		increment_displayTabuleiro_2for:
-		addi $t5, $t5, 4
-		lw $a0, 0($sp)
-		add $a0, $a0, $t5
-		#addi $a0, $a0, 4
-		addi $t2, $t2, 1
-		j displayTabuleiro_2for
-	sair_displayTabuleiro_2for:
-	li $v0, 4
-	la $a0, Enter
-	syscall
-	lw $a0, 0($sp)
-	add $a0, $a0, $t5
-	addi $t1, $t1, 1
-	j displayTabuleiro_1for
-sair_displayTabuleiro_1for:
-li $v0, 4
-la $a0, Enter
-syscall
-add $sp, $sp, 4
-jr $ra
 
 validarCima:
 add $v0, $t6, $0
@@ -1875,7 +1020,6 @@ add $a0, $t1, $0				# Valida??es para saber se vou validar ? esquerda (basicamen
 		j validacoesEsquerdaSair
 validacoesEsquerdaSair:
 jr $ra
-
 
 validacoesDireita:		# Valida??es para saber se vou validar ? direita (basicamente saber se esta posi??o ? a mais ? direita da linha pois ? a unica que n?o precisa validar ? direita)
 add $v0, $t7, $0
