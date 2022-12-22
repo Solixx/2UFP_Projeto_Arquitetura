@@ -9,7 +9,7 @@ JogadaAgua:		.asciiz "Agua \n"
 JogadaBomba:		.asciiz "Bomba \n"
 JogadaAfundou:		.asciiz "Afundou \n"
 Menu:			.asciiz "Insira 'a' -> Jogar Sozinho / 'b' -> Jogar Vs PC / 'e' -> Sair \n"
-teclaMenuErro:		.asciiz "Essa op??o n?o existe no menu, insira um nova op??o \n"
+teclaMenuErro:		.asciiz "Essa opcaoo nao existe no menu, insira um nova opcaoo \n"
 vezJogarPC:		.asciiz "Vez Do Computador \n"
 vezJogarUtilizador:	.asciiz "Vez Do Utilizador \n"
 editSizeBarcosMenu:	.asciiz "Editar tamanho dos Barcos? 1 -> Editar \n"
@@ -50,35 +50,35 @@ arrayPontuacao:		.space 8	# Pontuacoes (1 -> Utilizador / 2 -> PC)
 main:
 # $t1 -> opcao
 cicloMenu:
-	li $v0, 4
-	la $a0, Menu
+	li $v0, 4		# print String
+	la $a0, Menu		# escreve o que tem na label Menu
 	syscall
-	li $v0, 12
+	li $v0, 12		# lê carater
 	syscall
-	add $t1, $v0, $0
-	li $v0, 4
-	la $a0, Enter
+	add $t1, $v0, $0	# guarda em $t1 o carater inserido
+	li $v0, 4		# print String
+	la $a0, Enter		# escreve o que tem na label Enter
 	syscall
-	beq $t1, 'e', sairPrograma
-		beq $t1, 'a', jogoSozinho
-		beq $t1, 'b', jogoPc
-		teclaErrada:
-		li $v0, 4
-		la $a0, teclaMenuErro
+	beq $t1, 'e', sairPrograma		# if ($t1 == 'e') -> sairPrograma
+		beq $t1, 'a', jogoSozinho	# if($t1 == 'a') -> jogoSozinho
+		beq $t1, 'b', jogoPc		# if ($t1 == 'b') -> jogoPC
+		teclaErrada:			# else inserio uma tecla que nao existe nas opcoes
+		li $v0, 4			# print String
+		la $a0, teclaMenuErro		# escreve o que tem na label teclaMenuErro
 		syscall
-		j cicloMenu
-		jogoSozinho:
-		jal fase1Main
-		j cicloMenu
+		j cicloMenu			# Volta ao ciclo do menu
+		jogoSozinho:			
+		jal fase1Main			# Chama a funcao fase1Main
+		j cicloMenu			# Volta ao ciclo do menu
 		jogoPc:
-		jal fase2Main
-		j cicloMenu
+		jal fase2Main			# Chama a funcao fase2Main
+		j cicloMenu			# Volta ao ciclo do menu
 	sairPrograma:
-	j Exit
-j Exit
+	j Exit					# Jump para saida do programa
+j Exit						# Jump para saida do programa
 
 Exit:
-li $v0, 10
+li $v0, 10	# Sair do programa
 syscall
 
 
@@ -91,74 +91,74 @@ fase1Main:
 # $t2 -> tamanho do barco 	// t1
 # $t3 -> letra do Barco 	//$t2
 
-addi $sp, $sp, -16
-sw $ra, 0($sp)
-la $s0, tabuleiro
-la $s1, barcos
-sw $s0, 4($sp)
-sw $s1, 8($sp)
-addi $s2, $0, 1
-sw $s2, 12($sp)
-jal barcosPadra
-jal zerarTabuleiro
+addi $sp, $sp, -16		# Baixa stack em 16
+sw $ra, 0($sp)			# Guarda $ra na posicao 0 da stack
+la $s0, tabuleiro		# $s0 recebe o endereco do array tabuleiro
+la $s1, barcos			# $s1 recebe o endereco do array barcos
+sw $s0, 4($sp)			# Guarda $s0 na stack
+sw $s1, 8($sp)			# Guarda $s1 na stack
+addi $s2, $0, 1			# Inicializa $s2 = 1
+sw $s2, 12($sp)			# Guarda $s2 na stack
+jal barcosPadra			# Chama a funcao barcosPadra (cria e inicializa os arrays dos barcos com as posicoes padrao dos mesmos)
+jal zerarTabuleiro		# Chama a funcao zerarTabuleiro (serve para inicializar o tabuleiro a '-')
 
-la $t0, carrier
-lw $t2, 4($t0)
-lw $s0, 4($sp)
-jal gerarTabuleiro
+la $t0, carrier			# $t0 recebe o endereco do array do barco Carrier
+lw $t2, 4($t0)			# Recebe em $t2 o tamanho do barco Carrier (da memoria)
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+jal gerarTabuleiro		# Chama a funcao gerarTabuleiro (funcao que gera um barco no tabuleiro)
 
-lw $s2, 12($sp)
-addi $s2, $s2, 1
-sw $s2, 12($sp)
-lw $s1, 8($sp)
-addi $s1, $s1, 12
-sw $s1, 8($sp)
-la $t0, battleship
-lw $t2, 4($t0)
-lw $s0, 4($sp)
-jal gerarTabuleiro
+lw $s2, 12($sp)			# Recebe o numero do barco (da stack)
+addi $s2, $s2, 1		# Incrementa $s2++
+sw $s2, 12($sp)			# Guarda $s2 na stack
+lw $s1, 8($sp)			# Recebe o endereco do array dos barcos para $s1 (da stack)
+addi $s1, $s1, 12		# Avanca 12 (4) posicoes no array (pois cada barco tem reservadas 4 posicoes para as suas informacoes se quero mudar de barcos ando 4 posicoes)
+sw $s1, 8($sp)			# Guarda $s1 na stack
+la $t0, battleship		# Recebe o endereco do array do barco battleship
+lw $t2, 4($t0)			# Recebe o tamanho do barco (da stack)
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+jal gerarTabuleiro		# Chama a funcao gerarTabuleiro (funcao que gera um barco no tabuleiro)
 
-lw $s1, 8($sp)
-addi $s1, $s1, 12
-sw $s1, 8($sp)
-lw $s2, 12($sp)
-addi $s2, $s2, 1
-sw $s2, 12($sp)
-la $t0, destroyer
-lw $t2, 4($t0)
-lw $s0, 4($sp)
-jal gerarTabuleiro
+lw $s1, 8($sp)			# Recebe o endereco do array dos barcos para $s1 (da stack)
+addi $s1, $s1, 12		# Avanca 12 (4) posicoes no array (pois cada barco tem reservadas 4 posicoes para as suas informacoes se quero mudar de barcos ando 4 posicoes)
+sw $s1, 8($sp)			# Guarda $s1 na stack
+lw $s2, 12($sp)			# Recebe o numero atual do barco que vai ser inserido no tabuleiro (da stack)
+addi $s2, $s2, 1		# Incrementa $s2++
+sw $s2, 12($sp)			# Guarda $s2 na stack
+la $t0, destroyer		# Recebe o endereco do array do barco destroyer
+lw $t2, 4($t0)			# Recebe o tamanho do barco (da stack)
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+jal gerarTabuleiro		# Chama a funcao gerarTabuleiro (funcao que gera um barco no tabuleiro)
 
-lw $s1, 8($sp)
-addi $s1, $s1, 12
-sw $s1, 8($sp)
-lw $s2, 12($sp)
-addi $s2, $s2, 1
-sw $s2, 12($sp)
-la $t0, submarine
-lw $t2, 4($t0)
-lw $s0, 4($sp)
-jal gerarTabuleiro
+lw $s1, 8($sp)			# Recebe o endereco do array dos barcos para $s1 (da stack)
+addi $s1, $s1, 12		# Avanca 12 (4) posicoes no array (pois cada barco tem reservadas 4 posicoes para as suas informacoes se quero mudar de barcos ando 4 posicoes)
+sw $s1, 8($sp)			# Guarda $s1 na stack
+lw $s2, 12($sp)			# Recebe o numero atual do barco que vai ser inserido no tabuleiro (da stack)
+addi $s2, $s2, 1		# Incrementa $s2++
+sw $s2, 12($sp)			# Guarda $s2 na stack
+la $t0, submarine		# Recebe o endereco do array do barco submarine
+lw $t2, 4($t0)			# Recebe o tamanho do barco (da stack)
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+jal gerarTabuleiro		# Chama a funcao gerarTabuleiro (funcao que gera um barco no tabuleiro)
 
-lw $s1, 8($sp)
-addi $s1, $s1, 12
-sw $s1, 8($sp)
-lw $s2, 12($sp)
-addi $s2, $s2, 1
-sw $s2, 12($sp)
-la $t0, patrol
-lw $t2, 4($t0)
-lw $s0, 4($sp)
-jal gerarTabuleiro
+lw $s1, 8($sp)			# Recebe o endereco do array dos barcos para $s1 (da stack)
+addi $s1, $s1, 12		# Avanca 12 (4) posicoes no array (pois cada barco tem reservadas 4 posicoes para as suas informacoes se quero mudar de barcos ando 4 posicoes)
+sw $s1, 8($sp)			# Guarda $s1 na stack
+lw $s2, 12($sp)			# Recebe o numero atual do barco que vai ser inserido no tabuleiro (da stack)
+addi $s2, $s2, 1		# Incrementa $s2++
+sw $s2, 12($sp)			# Guarda $s2 na stack
+la $t0, patrol			# Recebe o endereco do array do barco patrol
+lw $t2, 4($t0)			# Recebe o tamanho do barco (da stack)
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+jal gerarTabuleiro		# Chama a funcao gerarTabuleiro (funcao que gera um barco no tabuleiro)
 
-lw $s0, 4($sp)
-#jal displayTabuleiro
-la $s1, barcos
-jal jogo
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+#jal displayTabuleiro		# Chama a funcao para dar display ao tabuleiro
+la $s1, barcos			# Recebe o endereco do array dos barcos para $s1
+jal jogo			# Chama a funcao do jogo
 
-lw $ra, 0($sp)
-addi $sp, $sp, 16
-jr $ra
+lw $ra, 0($sp)			# Recebe o $ra (da stack)
+addi $sp, $sp, 16		# Sube a stack
+jr $ra				# Returna da funcao
 
 
 fase2Main:
@@ -177,117 +177,117 @@ fase2Main:
 # $t4 -> pontuacoes		// t3
 # $t0 -> Editar tamanho de barcos ou nao (1 -> editar) / numero de barcos (menu utilizador)	//t5
 
-addi $sp, $sp, -40
-sw $ra, 0($sp)
-la $s0, tabuleiro
-la $s1, barcos
-la $s3, barcosPC
-add $s4, $0, $0
-add $s5, $0, $0
-add $s6, $0, $0
-la $s7, arrayPontuacao
-sw $s0, 4($sp)
-la $s0, tabuleiroPC
-sw $s0, 8($sp)
-sw $s1, 12($sp)
-sw $s3, 16($sp)
-sw $s4, 20($sp)
-sw $s5, 24($sp)
-sw $s6, 28($sp)
-sw $s7, 32($sp)
+addi $sp, $sp, -40		# Baixa a stack
+sw $ra, 0($sp)			# Guarda $ra na stack
+la $s0, tabuleiro		# Recebe o endereco do tabuleiro
+la $s1, barcos			# Recebe o endereco do array dos barcos
+la $s3, barcosPC		# Recebe o endereco do array dos barcos do PC
+add $s4, $0, $0			# Inicializa $s4 = 0
+add $s5, $0, $0			# Inicializa $s5 = 0		
+add $s6, $0, $0			# Inicializa $s6 = 0
+la $s7, arrayPontuacao		# Recebe o endereco do array de pontuacoes
+sw $s0, 4($sp)			# Guarda $s0 (tabuleiro) na stack
+la $s0, tabuleiroPC		# Recebe o endereco do tabuleiro do PC
+sw $s0, 8($sp)			# Guarda $s0 (tabuleiroPC) na stack
+sw $s1, 12($sp)			# Guarda $s1 na stack
+sw $s3, 16($sp)			# Guarda $s3 na stack
+sw $s4, 20($sp)			# Guarda $s4 na stack
+sw $s5, 24($sp)			# Guarda $s5 na stack
+sw $s6, 28($sp)			# Guarda $s6 na stack
+sw $s7, 32($sp)			# Guarda $s7 na stack
 
-li $v0, 4
-la $a0, editSizeBarcosMenu
+li $v0, 4			# Print String
+la $a0, editSizeBarcosMenu	# Escreve o que tem na label editSizeBarcosMenu
 syscall
-li $v0, 5
+li $v0, 5			# Receber um inteiro
 syscall
-add $t0, $v0, $0
-beq $t0, 1, editarSizeBarcos
-lw $s1, 16($sp)
-jal barcosPadra
-j sairBarcos
-lw $s1, 12($sp)
-jal barcosPadra
-editarSizeBarcos:
-lw $s1, 12($sp)
-jal barcosEdit
-sairBarcos:
-addi $s2, $0, 1
-sw $s2, 36($sp)
-lw $s0, 8($sp)
-jal zerarTabuleiro
+add $t0, $v0, $0		# Igualar $t1 ao inteiro inserido pelo utilizador
+beq $t0, 1, editarSizeBarcos	# if($t0 == 1) editarSizeBarcos
+lw $s1, 16($sp)			# Recebe o endereco dos barcos do PC (da stack)
+jal barcosPadra			# Chama a funcao de criar e inicializar os barcos com infos padrao
+j sairBarcos			# Jump para sair da parte dos barcos
+lw $s1, 12($sp)			# Recebe o endereco dos barcos do Utilizador (da stack)
+jal barcosPadra			# Chama a funcao de criar e inicializar os barcos com infos padrao
+editarSizeBarcos:		# Se o utilizador escolheu eidtar o tamanho dos barcos
+lw $s1, 12($sp)			# Recebe o endereco dos barcos do Utilizador (da stack)
+jal barcosEdit			# Chama a funcao que cria e iniializa os barcos com um tamanho escolhido pelo utilizador
+sairBarcos:			# sair das infos dos barcos
+addi $s2, $0, 1			# Inicializar $s2 = 1
+sw $s2, 36($sp)			# Guardar $s2 na stack
+lw $s0, 8($sp)			# Recebe o endereco do tabuleiro do PC
+jal zerarTabuleiro		# Chama a funcao para inicializar o tabuleir a '-'
 
-lw $s0, 4($sp)
-jal zerarTabuleiro
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro do Utilizador
+jal zerarTabuleiro		# Chama a funcao para inicializar o tabuleir a '-'
 
 numCarrier:
-li $v0, 4
-la $a0, editNumCarrier
+li $v0, 4			# Print String
+la $a0, editNumCarrier		# Escreve o que tem na label editNumCarrier
 syscall
-li $v0, 5
+li $v0, 5			# recebe um inteiro
 syscall
-add $t0, $v0, $0
-lw $s5, 24($sp)
-cicloNumCarrier:
-bge $s5, $t0, numBattleship
-lw $s4, 20($sp)
-bge $s4, 10, iniciarJogoPC
+add $t0, $v0, $0		# iguala $t0 ao inteiro inserido pelo utilizador
+lw $s5, 24($sp)			# Recebe o valor de $s5(I) (da stack)
+cicloNumCarrier:		# Ciclo para o barco carrier
+bge $s5, $t0, numBattleship	# If(I >= numeroDeBarcos) passa para o proximo barco
+lw $s4, 20($sp)			# Recebe o valor atual de barcos (usado para saber se nao ultrapassou os 10 barcos do limit)
+bge $s4, 10, iniciarJogoPC	# Se o numero de barcos for >= 10 vai direto para o inicializar o jogo
 #Gerar Carrier Utilizador
-lw $s1, 12($sp)
-add $s1, $s1, $s6
-la $t5, carrier
-lw $t2, 4($t5)
-lw $s0, 4($sp)
-jal gerarTabuleiro
+lw $s1, 12($sp)			# Recebe o endereco do array dos barcos (da stack)
+add $s1, $s1, $s6		# anda $s6 posicoes do array ( de 12 em 12 (assembly) / de 4 em 4 (C))
+la $t5, carrier			# Recebe o endereco do barcos carrier
+lw $t2, 4($t5)			# Recebe o tamanho do barco
+lw $s0, 4($sp)			# Recebe o endereco do tabuleiro (da stack)
+jal gerarTabuleiro		# Chama a funcao de gerarTabuleiro 
 #Gerar Carrier PC
-lw $s1, 16($sp)
-add $s1, $s1, $s6
-la $t5, carrier
-lw $t2, 4($t5)
-lw $s0, 8($sp)
-jal gerarTabuleiro
-lw $s2, 36($sp)
-addi $s2, $s2, 1
-sw $s2, 36($sp)
-addi $s4, $s4, 1
-sw $s4, 20($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
-j cicloNumCarrier
+lw $s1, 16($sp)			# Recebe o endereco dos barcos do PC (da stack)
+add $s1, $s1, $s6		# Avanca $s6 posicoes do array (12 em 12 (assembly) /  4 em 4 (C))
+la $t5, carrier			# Rece o endereco do barco carrier
+lw $t2, 4($t5)			# Recebe o tamanho do barco
+lw $s0, 8($sp)			# Recebe o endereco do tabuleiro do PC (da stack)
+jal gerarTabuleiro		# Chama a funcao de gerarTabuleiro 
+lw $s2, 36($sp)			# Recebe o numero atual do barco que vai ser usado para o tabuleiro
+addi $s2, $s2, 1		# Inrementa $s2++
+sw $s2, 36($sp)			# Guarda $s2 na stack
+addi $s4, $s4, 1		# Incrementa $s4++ (contador de barcos)
+sw $s4, 20($sp)			# Guardar o valor de $s4 na stack
+addi $s5, $s5, 1		# Inrecementa $s5++ (I)
+addi $s6, $s6, 12		# Incrementa $s6 + 12 (posicoe sdo array de barcos)
+j cicloNumCarrier		# Volta ao ciclo
 
 numBattleship:
-li $v0, 4
-la $a0, editNumBattleship
+li $v0, 4			
+la $a0, editNumBattleship	
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
-lw $s5, 24($sp)
+add $t0, $v0, $0		# Guarda em $t0 o inteiro do utilizador
+lw $s5, 24($sp)			# recebe I
 cicloNumBattleship:
-bge $s5, $t0, numDestroyer
-lw $s4, 20($sp)
-bge $s4, 10, iniciarJogoPC
-lw $s1, 12($sp)
-add $s1, $s1, $s6
+bge $s5, $t0, numDestroyer	# If(I >= numeroDeBarcos) passa para o proximo barco
+lw $s4, 20($sp)			# recebe contador de barcos
+bge $s4, 10, iniciarJogoPC	# if ($s4 >= 10)
+lw $s1, 12($sp)			# recebe endereco barcos 
+add $s1, $s1, $s6		# avanca posicoes
 #Gerar Carrier Utilizador
-la $t5, battleship
-lw $t2, 4($t5)
-lw $s0, 4($sp)
+la $t5, battleship		
+lw $t2, 4($t5)			# recebe tamanho do barco
+lw $s0, 4($sp)			# recebe tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
-lw $s1, 16($sp)
-add $s1, $s1, $s6
+lw $s1, 16($sp)			# recebe endereco barcos PC
+add $s1, $s1, $s6		# avanca posicoes
 la $t5, battleship
-lw $t2, 4($t5)
+lw $t2, 4($t5)			# recebe tamanho barco
 lw $s0, 8($sp)
 jal gerarTabuleiro
-lw $s2, 36($sp)
-addi $s2, $s2, 1
-sw $s2, 36($sp)
-addi $s4, $s4, 1
-sw $s4, 20($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
+lw $s2, 36($sp)			# recebe numero do barco (no tabuleiro)
+addi $s2, $s2, 1		# incremenat
+sw $s2, 36($sp)			# guarda
+addi $s4, $s4, 1		# contador de barcos +1
+sw $s4, 20($sp)			# guarda
+addi $s5, $s5, 1		# I ++
+addi $s6, $s6, 12		# incrmenat posicoes (array de barcos)
 j cicloNumBattleship
 
 numDestroyer:
@@ -296,33 +296,33 @@ la $a0, editNumDestroyer
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
-lw $s5, 24($sp)
+add $t0, $v0, $0		# recebe o inteiro do utilizador
+lw $s5, 24($sp)			# recebe I
 cicloNumDestroyer:
-bge $s5, $t0, numSubmarine
-lw $s4, 20($sp)
-bge $s4, 10, iniciarJogoPC
-lw $s1, 12($sp)
-add $s1, $s1, $s6
+bge $s5, $t0, numSubmarine	# If(I >= numeroDeBarcos) passa para o proximo barco
+lw $s4, 20($sp)			# recebe contador de barcos
+bge $s4, 10, iniciarJogoPC	# if($s4 >= 10)
+lw $s1, 12($sp)			# recebe endereco barcos
+add $s1, $s1, $s6		# incremenat $S6 posicoes
 #Gerar Carrier Utilizador
-la $t5, destroyer
-lw $t2, 4($t5)
-lw $s0, 4($sp)
+la $t5, destroyer		
+lw $t2, 4($t5)			# recebe tamnho do barco
+lw $s0, 4($sp)		
 jal gerarTabuleiro
 #Gerar Carrier PC
-lw $s1, 16($sp)
-add $s1, $s1, $s6
+lw $s1, 16($sp)			# recebe endereco barcos do PC
+add $s1, $s1, $s6		# incremenat $S6 posicoes
 la $t5, destroyer
-lw $t2, 4($t5)
+lw $t2, 4($t5)			# recebe tamanho do barco
 lw $s0, 8($sp)
 jal gerarTabuleiro
-lw $s2, 36($sp)
-addi $s2, $s2, 1
-sw $s2, 36($sp)
-addi $s4, $s4, 1
-sw $s4, 20($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
+lw $s2, 36($sp)			# recebe numero do barco (no tabuleiro)
+addi $s2, $s2, 1		# $s2++
+sw $s2, 36($sp)			# guarda $s2
+addi $s4, $s4, 1		# numero de barcos ++
+sw $s4, 20($sp)			# guarda
+addi $s5, $s5, 1		# i++
+addi $s6, $s6, 12		# incrementa posicoes do array de barcos +12
 j cicloNumDestroyer
 
 numSubmarine:
@@ -331,33 +331,33 @@ la $a0, editNumSubmarine
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
-lw $s5, 24($sp)
+add $t0, $v0, $0		# recebe o inteiro do utilizador
+lw $s5, 24($sp)			# recebe I
 cicloNumSubmarine:
-bge $s5, $t0, numPatrol
-lw $s4, 20($sp)
-bge $s4, 10, iniciarJogoPC
-lw $s1, 12($sp)
-add $s1, $s1, $s6
+bge $s5, $t0, numPatrol	# If(I >= numeroDeBarcos) passa para o proximo barco
+lw $s4, 20($sp)			# recebe contador de barcos
+bge $s4, 10, iniciarJogoPC	# if ($s4 >= 10)
+lw $s1, 12($sp)			# recebe endereco de barcos
+add $s1, $s1, $s6		# avanca $s6 posicoes do array
 #Gerar Carrier Utilizador
 la $t5, submarine
-lw $t2, 4($t5)
+lw $t2, 4($t5)			# recebe tamanho do barco
 lw $s0, 4($sp)
 jal gerarTabuleiro
 #Gerar Carrier PC
-lw $s1, 16($sp)
-add $s1, $s1, $s6
-la $t5, submarine
-lw $t2, 4($t5)
+lw $s1, 16($sp)			# recebe endereco de barcos PC
+add $s1, $s1, $s6		# incremenat $s6 posicos no array
+la $t5, submarine	
+lw $t2, 4($t5)			# recebe tamanho do barco
 lw $s0, 8($sp)
 jal gerarTabuleiro
-lw $s2, 36($sp)
-addi $s2, $s2, 1
-sw $s2, 36($sp)
-addi $s4, $s4, 1
-sw $s4, 20($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
+lw $s2, 36($sp)			# recebe numero do barco no tabuleiro
+addi $s2, $s2, 1		# incremenat $s2++
+sw $s2, 36($sp)			# guarda $s2 na stack
+addi $s4, $s4, 1		# incrementa o contador de barcos
+sw $s4, 20($sp)			# guarda na stack $s4
+addi $s5, $s5, 1		# i++
+addi $s6, $s6, 12		# increenta o avanco de posicoes do array de barcos
 j cicloNumSubmarine
 
 numPatrol:
@@ -366,52 +366,52 @@ la $a0, editNumPatrol
 syscall
 li $v0, 5
 syscall
-add $t0, $v0, $0
-lw $s5, 24($sp)
+add $t0, $v0, $0		# recebe o inteiro do utilizador
+lw $s5, 24($sp)			# recebe o I
 cicloNumPatrol:
-bge $s5, $t0, iniciarJogoPC
-lw $s4, 20($sp)
-bge $s4, 10, iniciarJogoPC
-lw $s1, 12($sp)
-add $s1, $s1, $s6
+bge $s5, $t0, iniciarJogoPC	# If(I >= numeroDeBarcos) vai para o iniciar Jogo
+lw $s4, 20($sp)			# recebe o contador de barcos
+bge $s4, 10, iniciarJogoPC	# if($s4 >= 10)
+lw $s1, 12($sp)			# recebe o endereco de barcos
+add $s1, $s1, $s6		# avanca $s6 posicoes
 #Gerar Carrier Utilizador
-la $t5, patrol
-lw $t2, 4($t5)
-lw $s0, 4($sp)
+la $t5, patrol		
+lw $t2, 4($t5)			# recebe tamanho do barco de $t5
+lw $s0, 4($sp)			
 jal gerarTabuleiro
-#Gerar Carrier PC
-lw $s1, 16($sp)
-add $s1, $s1, $s6
+#Gerar Carrier PC	
+lw $s1, 16($sp)			# recebe o endereco de barcos PC
+add $s1, $s1, $s6		# avanca $s6 posicoes no array
 la $t5, patrol
-lw $t2, 4($t5)
+lw $t2, 4($t5)			# recebe o tamanho do barco
 lw $s0, 8($sp)
 jal gerarTabuleiro
-lw $s2, 36($sp)
-addi $s2, $s2, 1
-sw $s2, 36($sp)
-addi $s4, $s4, 1
-sw $s4, 20($sp)
-addi $s5, $s5, 1
-addi $s6, $s6, 12
+lw $s2, 36($sp)			# recebe o numero do barco no tabuleiro
+addi $s2, $s2, 1		# incrementa $s2++
+sw $s2, 36($sp)			# guarda $s2 na stack
+addi $s4, $s4, 1		# contador de barcos ++
+sw $s4, 20($sp)			# guarda na stacl
+addi $s5, $s5, 1		# i++
+addi $s6, $s6, 12		# incrementa o avanco de posicoes no array de barcos
 j cicloNumPatrol
 
 iniciarJogoPC:
-lw $s0, 4($sp)
-jal displayTabuleiro
+lw $s0, 4($sp)			# recebe o endereco do tabuleiro
+jal displayTabuleiro		# chama funcao de display do tabuleiro
 
-lw $s0, 8($sp)
+lw $s0, 8($sp)			# recebe o endereco do tabuleiro do PC
 #jal displayTabuleiro
 
-lw $s1, 12($sp)
-lw $s3, 16($sp)
-jal jogoPC
-
-li $v0, 4
+lw $s1, 12($sp)			# recebe o endereco do array de barcos
+lw $s3, 16($sp) 		# recebe o endereco do array de barcos do PC
+jal jogoPC			# chama a funcao do jogo (jogoPC)
+	
+li $v0, 4			
 la $a0, pontosUtilizador
 syscall
-li $v0, 1
-lw $t4, 0($s7)
-move $a0, $t4
+li $v0, 1			# print inteiro
+lw $t4, 0($s7)			# recebe o valor da primeira posicao do arary de pontuacoes (pontuacao do utilzaidor)
+move $a0, $t4			# move o valor para $a0
 syscall
 li $v0, 4
 la $a0, Enter
@@ -419,16 +419,16 @@ syscall
 li $v0, 4
 la $a0, pontosPC
 syscall
-li $v0, 1
-lw $t4, 4($s7)
-move $a0, $t4
-syscall
+li $v0, 1			# print inteiro
+lw $t4, 4($s7)			# recebe o valor da primeira posicao do arary de pontuacoes (pontuacao do PC)
+move $a0, $t4			# move o valor para $a0
+syscall				
 li $v0, 4
 la $a0, Enter
 syscall
 
-lw $ra, 0($sp)
-addi $sp, $sp, 40
+lw $ra, 0($sp)			# recebe o $ra
+addi $sp, $sp, 40		# sube a stack
 jr $ra
 
 
@@ -443,112 +443,112 @@ jogo:
 # $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
 # $t6 -> contadores de barcos
 
-add $sp, $sp, -16
-sw $ra, 0($sp)
-add $a0, $s1, $0
-add $a1, $s0, $0
-la $s0, copiaTabuleiro
-sw $a0, 4($sp)
-sw $a1, 8($sp)
-sw $s0, 12($sp)
-jal zerarTabuleiroCopia
+add $sp, $sp, -16		# baixa a stack
+sw $ra, 0($sp)			# guarda $ra
+add $a0, $s1, $0		# recebe em $a0 o valor de $s1
+add $a1, $s0, $0		# recebe em $a1 o valor de $s0	
+la $s0, copiaTabuleiro		# recebe o endereco de copiaTabuleiro
+sw $a0, 4($sp)			# guarda $a0 na stack
+sw $a1, 8($sp)			# guarda $a1 na stack
+sw $s0, 12($sp)			# guarda $s0 na stack
+jal zerarTabuleiroCopia		# chama a funcao de zerarTabuleiroCopia cria e inicializa a copiaTabuleiro a '-'
 cicloJogo:
-	jal displayTabuleiroJogo
+	jal displayTabuleiroJogo	# chama funcao de display do tabuleiro do jogo (copiaTabuleiro)
 	posUtilizador:
-	lw $a0, 4($sp)
-	li $v0, 12
+	lw $a0, 4($sp)			# recebe o endereco dos barcos
+	li $v0, 12			# le carater do teclado (linha do tabuleiro)
 	syscall
-	add $t1, $v0, $0
-	li $v0, 5
+	add $t1, $v0, $0		# iguala $t1 ao carater inserido pelo utilzaidor
+	li $v0, 5			# le inteiro do teclado (coluna do tabuleiro) 
 	syscall
-	add $t2, $v0, $0
-	addi $t1, $t1, -97	# Passar de A -> 1, b -> 2 etc... (96 ? o valor de A)
-	bge $t1, 10, posUtilizador
-	bge $t2, 10, posUtilizador
-	mul $t1, $t1, 4
-	mul $t2, $t2, 40
-	add $t3, $t1, $t2
-	bge $t3, 400, posUtilizador
+	add $t2, $v0, $0		# iguala $t2 ao inteiro inserido pelo utilzaidor	
+	addi $t1, $t1, -97		# Passar de A -> 1, b -> 2 etc... (97 e o valor de A)
+	bge $t1, 10, posUtilizador	# if(valor da letra >= 10) esta fora do tabuleiro volta a pedir todo de novo ao utilzador
+	bge $t2, 10, posUtilizador	# if(coluna >= 10) esta fora do tabuleiro volta a pedir todo de novo ao utilzador
+	mul $t1, $t1, 4			# multiplica o valor da letra * 4 para usar nas posicoes do array dos tabuleiros (4 -> por ser coluna)
+	mul $t2, $t2, 40		# multiplica o valor da letra * 40 para usar nas posicoes do array dos tabuleiros (40 -> por ser linha)
+	add $t3, $t1, $t2		# soma todo para $t3 e isto e a posicao no array dos tabuleiros
+	bge $t3, 400, posUtilizador	# if ($t3 >= 400) esta fora do tabuleiro volta a pedir todo de novo ao utilizador
 	
-	lw $a1, 8($sp)
-	la $t0, copiaTabuleiro
-	add $t0, $t0, $t3
-	lw $t4, 0($t0)
-	bne $t4, '-', jogadaRepetida
-		add $a1, $a1, $t3
-		lw $t4, 0($a1)
-		beq $t4, '-', aguaJogada
-		lw $a0, 4($sp)
+	lw $a1, 8($sp)			# recebe o endereco do tabuleiro
+	la $t0, copiaTabuleiro		# recebe o endereco da copiaTabuleiro
+	add $t0, $t0, $t3		# avanca para a posicao que o utilizador escolheu no array copiaTabuleiro
+	lw $t4, 0($t0)			# recebe o valor dessa posicao
+	bne $t4, '-', jogadaRepetida	# if($t4 != '-') esta posicaoja foi inserida anteriormente 
+		add $a1, $a1, $t3			# avanca para a posicao inserida pelo utilizador no tabuleiro
+		lw $t4, 0($a1)				# recebe o valor em $t4
+		beq $t4, '-', aguaJogada		# if($t4 == '-') nao havia barco nessa posicao ent e agua
+		lw $a0, 4($sp)				# else{ recebe o endereco do array de barcos
 		cicloVerArrayBarco:
-			lw $t6, 0($a0)
-			bne $t4, $t6, incrementar_a0
-			lw $t3, 4($a0)
-			lw $t6, 8($a0)
-			addi $t6, $t6, 1
-			sw $t6, 8($a0)
-			la $t5, 'X'
-			sw $t5, 0($t0)
-			jal displayTabuleiroJogo
-			bne $t3, $t6, acertouJogada
-				li $v0, 4
+			lw $t6, 0($a0)				# recebe o valor do endereco de barcos	
+			bne $t4, $t6, incrementar_a0		# if(barco da posicao utilizador != barco do array) continua a avancar no array ate encontrar o barco certo
+			lw $t3, 4($a0)				# se os barcos sao iguais, recebe o tamanho do barco do array de barcos
+			lw $t6, 8($a0)				# recebe o contador de quantas pecas desse barco foram destruidas
+			addi $t6, $t6, 1			# incrementa o numero de pecas destruidas
+			sw $t6, 8($a0)				# guarda no array
+			la $t5, 'X'				# $t5 = 'X'
+			sw $t5, 0($t0)				# guarda 'X' no copiaTabuleiro na posicao do utilizador
+			jal displayTabuleiroJogo		# chama funcao de display do tabuleiro
+			bne $t3, $t6, acertouJogada		# if(tamanho do barco != contador de pecas destruidas) barco ainda nao afundou
+				li $v0, 4			# else escreve "afundou" na consola
 				la $a0, JogadaAfundou
 				syscall
 			acertouJogada:
-			li $v0, 4
+			li $v0, 4				# escreve "bomba" na consola
 			la $a0, JogadaBomba
 			syscall
-			j chekarSeTodosBarcosAfundaram
+			j chekarSeTodosBarcosAfundaram		# jump para ver se todos os barcos do array ja foram afundados
 			incrementar_a0:
-			addi $a0, $a0, 12 
+			addi $a0, $a0, 12 			# incrementa endereco de barcos para continuar no ciclo para ver os barcos do array e o barco do tabuleiro acertado
 			j cicloVerArrayBarco
 		aguaJogada:
-		la $t5, '0'
-		sw $t5, 0($t0)
-		jal displayTabuleiroJogo
-		li $v0, 4
+		la $t5, '0'			# $t5 = '0'
+		sw $t5, 0($t0)			# guarda '0' no copiaTabuleiro na posicao do utilizador
+		jal displayTabuleiroJogo	# chama funcao de display do tabuleiro
+		li $v0, 4			# escreve "agua" na consola
 		la $a0, JogadaAgua
 		syscall
-		j posUtilizador
+		j posUtilizador			# volta a pedir as posicoes ao utilizador
 
 		chekarSeTodosBarcosAfundaram:
-		lw $a0, 4($sp)
+		lw $a0, 4($sp)			# recebe o endereco dos barcos
 		# t4 -> barco
 		# t5 -> size barco
 		# t6 -> contador barco
-		ciclo_chekarSeTodosBarcosAfundaram:
-		lw $t4, 0($a0)
-		lw $t5, 4($a0)
-		lw $t6, 8($a0)
-		bne $t5, $t6, posUtilizador
-		bge $t4, 100, sairJogo
-		add $a0, $a0, 12
-		j ciclo_chekarSeTodosBarcosAfundaram
+		ciclo_chekarSeTodosBarcosAfundaram:	
+		lw $t4, 0($a0)				# recebe o numero do barcos 
+		lw $t5, 4($a0)				# recebe o tamanho do barco
+		lw $t6, 8($a0)				# recebe o contador de pecas destruidas do barco
+		bne $t5, $t6, posUtilizador		# if($t5 != $t6) existe pelo menis um barco que ainda nao afundou ent o jogo ainda n acaba
+		bge $t4, 100, sairJogo			# if($t4 >= 100) todos os barcos afundaram (100 e um valor escolhido por mim como ultimo valor do array de barcos se chegar ate este valor quer dizer q todos os barco afundaram)
+		add $a0, $a0, 12			# incremenat o array de barcos (12 em 12 (assembly) / 4 em 4 (C)) pois ada barco tem 4 posicoes reservadas para si no array
+		j ciclo_chekarSeTodosBarcosAfundaram	# chama o ciclo de novo
 	jogadaRepetida:
-	li $v0, 4
+	li $v0, 4			# Escreve que a posicao ja foi inserida anteriormente e pede ao utilizador para inserir outra
 	la $a0, JogadaRepetida
 	syscall
 	j posUtilizador
 j cicloJogo
 sairJogo:
 zerarArrayBarcos:
-lw $a0, 4($sp)
+lw $a0, 4($sp)		# recebe o endereco dos barcos
 # t4 -> barco
 # t5 -> size barco
 # t6 -> contador barco
 ciclo_zerarArrayBarcos:
-lw $t4, 0($a0)
-bge $t4, 100, sairJogoDepoisDeZerar
-add $t4, $0, $0
-sw $t4, 0($a0)
-add $a0, $a0, 12
-j ciclo_zerarArrayBarcos
+lw $t4, 0($a0)				# recebe o numero do barco
+bge $t4, 100, sairJogoDepoisDeZerar	# if($t4 >= 100) ja zerou todos os barcos
+add $t4, $0, $0				# iguala $t4 = 0
+sw $t4, 0($a0)				# insere no array de barcos
+add $a0, $a0, 12			# avanca 12 posicoes no array
+j ciclo_zerarArrayBarcos		# chama o ciclo de novo
 
 sairJogoDepoisDeZerar:
-add $t4, $0, $0
-sw $t4, 0($a0)
-lw $ra, 0($sp)
-add $sp, $sp, 16
-jr $ra
+add $t4, $0, $0			# iguala $t4 = 0
+sw $t4, 0($a0)			# guarda no aray de barcos (para substituir o 100 por 0)
+lw $ra, 0($sp)			# recebe $ra
+add $sp, $sp, 16		# sube a stack
+jr $ra				# returna da funcao
 
 
 
