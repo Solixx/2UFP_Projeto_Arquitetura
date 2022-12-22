@@ -71,7 +71,7 @@ cicloMenu:
 		jal fase1Main
 		j cicloMenu
 		jogoPc:
-		#jal fase2Main
+		jal fase2Main
 		j cicloMenu
 	sairPrograma:
 	j Exit
@@ -85,18 +85,20 @@ syscall
 fase1Main:
 # $t0 -> endere?o do barco 	// a0
 # $s0 -> endere?o do tabuleiro
+# $s2 -> numero do barco
 # $s1 -> endere?o dos barcos
 # $t1 -> numero do barco 	//s2
 # $t2 -> tamanho do barco 	// t1
 # $t3 -> letra do Barco 	//$t2
 
-addi $sp, $sp, -12
+addi $sp, $sp, -16
 sw $ra, 0($sp)
 la $s0, tabuleiro
 la $s1, barcos
 sw $s0, 4($sp)
 sw $s1, 8($sp)
-addi $t1, $0, 1
+addi $s2, $0, 1
+sw $s2, 12($sp)
 jal barcosPadra
 jal zerarTabuleiro
 
@@ -105,7 +107,9 @@ lw $t2, 4($t0)
 lw $s0, 4($sp)
 jal gerarTabuleiro
 
-add $t1, $v0, $0
+lw $s2, 12($sp)
+addi $s2, $s2, 1
+sw $s2, 12($sp)
 lw $s1, 8($sp)
 addi $s1, $s1, 12
 sw $s1, 8($sp)
@@ -117,7 +121,9 @@ jal gerarTabuleiro
 lw $s1, 8($sp)
 addi $s1, $s1, 12
 sw $s1, 8($sp)
-add $t1, $v0, $0
+lw $s2, 12($sp)
+addi $s2, $s2, 1
+sw $s2, 12($sp)
 la $t0, destroyer
 lw $t2, 4($t0)
 lw $s0, 4($sp)
@@ -126,7 +132,9 @@ jal gerarTabuleiro
 lw $s1, 8($sp)
 addi $s1, $s1, 12
 sw $s1, 8($sp)
-add $t1, $v0, $0
+lw $s2, 12($sp)
+addi $s2, $s2, 1
+sw $s2, 12($sp)
 la $t0, submarine
 lw $t2, 4($t0)
 lw $s0, 4($sp)
@@ -135,7 +143,9 @@ jal gerarTabuleiro
 lw $s1, 8($sp)
 addi $s1, $s1, 12
 sw $s1, 8($sp)
-add $t1, $v0, $0
+lw $s2, 12($sp)
+addi $s2, $s2, 1
+sw $s2, 12($sp)
 la $t0, patrol
 lw $t2, 4($t0)
 lw $s0, 4($sp)
@@ -147,10 +157,279 @@ la $s1, barcos
 jal jogo
 
 lw $ra, 0($sp)
-addi $sp, $sp, 12
+addi $sp, $sp, 16
 jr $ra
 
 
+fase2Main:
+# $t5 -> endere?o do barco 	// t0
+# $s0 -> endere?o do tabuleiro
+# $s1 -> endere?o dos barcos
+# $s2 -> numero do barco
+# $s3 -> endere?o dos barcosPC
+# $s4 -> contador de barcos (max 10)
+# $s5 -> I
+# $s6 -> contador da pos atual do array de barcos
+# $s7 -> endereço do array de pontuacoes
+# $t1 -> numero do barco 	// s2
+# $t2 -> tamanho do barco 	// t1
+# $t3 -> letra do Barco		// t2
+# $t4 -> pontuacoes		// t3
+# $t0 -> Editar tamanho de barcos ou nao (1 -> editar) / numero de barcos (menu utilizador)	//t5
+
+addi $sp, $sp, -40
+sw $ra, 0($sp)
+la $s0, tabuleiro
+la $s1, barcos
+la $s3, barcosPC
+add $s4, $0, $0
+add $s5, $0, $0
+add $s6, $0, $0
+la $s7, arrayPontuacao
+sw $s0, 4($sp)
+la $s0, tabuleiroPC
+sw $s0, 8($sp)
+sw $s1, 12($sp)
+sw $s3, 16($sp)
+sw $s4, 20($sp)
+sw $s5, 24($sp)
+sw $s6, 28($sp)
+sw $s7, 32($sp)
+
+li $v0, 4
+la $a0, editSizeBarcosMenu
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+beq $t0, 1, editarSizeBarcos
+lw $s1, 16($sp)
+jal barcosPadra
+j sairBarcos
+lw $s1, 12($sp)
+jal barcosPadra
+editarSizeBarcos:
+lw $s1, 12($sp)
+jal barcosEdit
+sairBarcos:
+addi $s2, $0, 1
+sw $s2, 36($sp)
+lw $s0, 8($sp)
+jal zerarTabuleiro
+
+lw $s0, 4($sp)
+jal zerarTabuleiro
+
+numCarrier:
+li $v0, 4
+la $a0, editNumCarrier
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 24($sp)
+cicloNumCarrier:
+bge $s5, $t0, numBattleship
+lw $s4, 20($sp)
+bge $s4, 10, iniciarJogoPC
+#Gerar Carrier Utilizador
+lw $s1, 12($sp)
+add $s1, $s1, $s6
+la $t5, carrier
+lw $t2, 4($t5)
+lw $s0, 4($sp)
+jal gerarTabuleiro
+#Gerar Carrier PC
+lw $s1, 16($sp)
+add $s1, $s1, $s6
+la $t5, carrier
+lw $t2, 4($t5)
+lw $s0, 8($sp)
+jal gerarTabuleiro
+lw $s2, 36($sp)
+addi $s2, $s2, 1
+sw $s2, 36($sp)
+addi $s4, $s4, 1
+sw $s4, 20($sp)
+addi $s5, $s5, 1
+addi $s6, $s6, 12
+j cicloNumCarrier
+
+numBattleship:
+li $v0, 4
+la $a0, editNumBattleship
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 24($sp)
+cicloNumBattleship:
+bge $s5, $t0, numDestroyer
+lw $s4, 20($sp)
+bge $s4, 10, iniciarJogoPC
+lw $s1, 12($sp)
+add $s1, $s1, $s6
+#Gerar Carrier Utilizador
+la $t5, battleship
+lw $t2, 4($t5)
+lw $s0, 4($sp)
+jal gerarTabuleiro
+#Gerar Carrier PC
+lw $s1, 16($sp)
+add $s1, $s1, $s6
+la $t5, battleship
+lw $t2, 4($t5)
+lw $s0, 8($sp)
+jal gerarTabuleiro
+lw $s2, 36($sp)
+addi $s2, $s2, 1
+sw $s2, 36($sp)
+addi $s4, $s4, 1
+sw $s4, 20($sp)
+addi $s5, $s5, 1
+addi $s6, $s6, 12
+j cicloNumBattleship
+
+numDestroyer:
+li $v0, 4
+la $a0, editNumDestroyer
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 24($sp)
+cicloNumDestroyer:
+bge $s5, $t0, numSubmarine
+lw $s4, 20($sp)
+bge $s4, 10, iniciarJogoPC
+lw $s1, 12($sp)
+add $s1, $s1, $s6
+#Gerar Carrier Utilizador
+la $t5, destroyer
+lw $t2, 4($t5)
+lw $s0, 4($sp)
+jal gerarTabuleiro
+#Gerar Carrier PC
+lw $s1, 16($sp)
+add $s1, $s1, $s6
+la $t5, destroyer
+lw $t2, 4($t5)
+lw $s0, 8($sp)
+jal gerarTabuleiro
+lw $s2, 36($sp)
+addi $s2, $s2, 1
+sw $s2, 36($sp)
+addi $s4, $s4, 1
+sw $s4, 20($sp)
+addi $s5, $s5, 1
+addi $s6, $s6, 12
+j cicloNumDestroyer
+
+numSubmarine:
+li $v0, 4
+la $a0, editNumSubmarine
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 24($sp)
+cicloNumSubmarine:
+bge $s5, $t0, numPatrol
+lw $s4, 20($sp)
+bge $s4, 10, iniciarJogoPC
+lw $s1, 12($sp)
+add $s1, $s1, $s6
+#Gerar Carrier Utilizador
+la $t5, submarine
+lw $t2, 4($t5)
+lw $s0, 4($sp)
+jal gerarTabuleiro
+#Gerar Carrier PC
+lw $s1, 16($sp)
+add $s1, $s1, $s6
+la $t5, submarine
+lw $t2, 4($t5)
+lw $s0, 8($sp)
+jal gerarTabuleiro
+lw $s2, 36($sp)
+addi $s2, $s2, 1
+sw $s2, 36($sp)
+addi $s4, $s4, 1
+sw $s4, 20($sp)
+addi $s5, $s5, 1
+addi $s6, $s6, 12
+j cicloNumSubmarine
+
+numPatrol:
+li $v0, 4
+la $a0, editNumPatrol
+syscall
+li $v0, 5
+syscall
+add $t0, $v0, $0
+lw $s5, 24($sp)
+cicloNumPatrol:
+bge $s5, $t0, iniciarJogoPC
+lw $s4, 20($sp)
+bge $s4, 10, iniciarJogoPC
+lw $s1, 12($sp)
+add $s1, $s1, $s6
+#Gerar Carrier Utilizador
+la $t5, patrol
+lw $t2, 4($t5)
+lw $s0, 4($sp)
+jal gerarTabuleiro
+#Gerar Carrier PC
+lw $s1, 16($sp)
+add $s1, $s1, $s6
+la $t5, patrol
+lw $t2, 4($t5)
+lw $s0, 8($sp)
+jal gerarTabuleiro
+lw $s2, 36($sp)
+addi $s2, $s2, 1
+sw $s2, 36($sp)
+addi $s4, $s4, 1
+sw $s4, 20($sp)
+addi $s5, $s5, 1
+addi $s6, $s6, 12
+j cicloNumPatrol
+
+iniciarJogoPC:
+lw $s0, 4($sp)
+jal displayTabuleiro
+
+lw $s0, 8($sp)
+#jal displayTabuleiro
+
+lw $s1, 12($sp)
+lw $s3, 16($sp)
+jal jogoPC
+
+li $v0, 4
+la $a0, pontosUtilizador
+syscall
+li $v0, 1
+lw $t4, 0($s7)
+move $a0, $t4
+syscall
+li $v0, 4
+la $a0, Enter
+syscall
+li $v0, 4
+la $a0, pontosPC
+syscall
+li $v0, 1
+lw $t4, 4($s7)
+move $a0, $t4
+syscall
+li $v0, 4
+la $a0, Enter
+syscall
+
+lw $ra, 0($sp)
+addi $sp, $sp, 40
+jr $ra
 
 
 jogo:
@@ -250,7 +529,6 @@ cicloJogo:
 	syscall
 	j posUtilizador
 j cicloJogo
-
 sairJogo:
 zerarArrayBarcos:
 lw $a0, 4($sp)
@@ -270,6 +548,480 @@ add $t4, $0, $0
 sw $t4, 0($a0)
 lw $ra, 0($sp)
 add $sp, $sp, 16
+jr $ra
+
+
+
+jogoPC:
+# a0 -> endere?o dos barcos
+# a1 -> endereco dos barcosPC
+# a2 -> Pontuacoes
+# $s0 -> endere?o do tabuleiro
+# $s1 -> endere?o do copiaTabuleiro
+# $s2 -> endere?o do tabuleiroPC
+# $s3 -> endere?o do copiaTabuleiroPC
+# $s0 -> endere?o do tabuleiroPC
+# $s1 -> endere?o do copiaTabuleiroPC
+# $t1 -> char coluna
+# $t2 -> numero linha
+# $t3 -> posi??o escolhida pelo utilizador final / size do barco acertado
+# $t4 -> valores dos tabuleiros
+# $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
+# $t6 -> contadores de barcos
+# $t7 -> vez de jogar (1 -> Utilizador / 2-> PC)
+add $sp, $sp, -32
+sw $ra, 0($sp)
+add $a0, $s1, $0
+add $a2, $s7, $0
+add $a1, $s3, $0
+la $s0, tabuleiro
+la $s1, copiaTabuleiro
+la $s2, tabuleiroPC
+la $s3, copiaTabuleiroPC
+sw $a0, 4($sp)
+sw $a1, 8($sp)
+sw $a2, 12($sp)
+sw $s0, 16($sp)
+sw $s1, 20($sp)
+sw $s2, 24($sp)
+sw $s3, 28($sp)
+add $t7, $0, $0
+addi $t9, $0, -1
+jal copiarTabuleiroCopia
+jal zerarTabuleiroCopiaPC
+lw $a0, 4($sp)
+lw $a1, 8($sp)
+lw $a2, 12($sp)
+cicloJogoPC:
+	jal displayTabuleiroBitMap
+	jal displayTabuleiroJogoPC
+	lw $a0, 4($sp)
+	lw $a1, 8($sp)
+	lw $a2, 12($sp)
+	validarVezJogada:
+	beq $t7, 2, vezPC
+	vezUtilizador:
+	li $v0, 4
+	la $a0, vezJogarUtilizador
+	syscall
+	lw $a1, 8($sp)
+	li $v0, 12
+	syscall
+	add $t1, $v0, $0
+	li $v0, 5
+	syscall
+	add $t2, $v0, $0
+	addi $t1, $t1, -97	# Passar de A -> 1, b -> 2 etc... (96 ? o valor de A)
+	bge $t1, 10, vezUtilizador
+	bge $t2, 10, vezUtilizador
+	mul $t1, $t1, 4
+	mul $t2, $t2, 40
+	add $t3, $t1, $t2
+	bge $t3, 400, vezUtilizador
+	
+	lw $s2, 24($sp)
+	lw $s3, 28($sp)
+	add $s3, $s3, $t3
+	lw $t4, 0($s3)
+	bne $t4, '-', jogadaRepetidaUtilizador
+		add $s2, $s2, $t3
+		lw $t4, 0($s2)
+		beq $t4, '-', aguaJogadaUtilizador
+		lw $a1, 8($sp)
+		cicloVerArrayBarcoUtilizador:
+			lw $t6, 0($a1)
+			bne $t4, $t6, incrementar_a1_Utilizador
+			
+			lw $t3, 4($a1)
+			lw $t6, 8($a1)
+			addi $t6, $t6, 1
+			sw $t6, 8($a1)
+			la $t5, 'X'
+			sw $t5, 0($s3)
+			#jal displayTabuleiroJogoPC
+			bne $t3, $t6, acertouJogadaUtilizador
+				li $v0, 4
+				la $a0, JogadaAfundou
+				syscall
+			acertouJogadaUtilizador:
+			
+			div $t1, $t1, 4
+			div $t2, $t2, 40
+			mul $t1, $t1, 25
+			mul $t2, $t2, 25
+			add $t1, $t1, 260
+			#li $a0,20
+			add $a0, $0, $t1
+			li $a1,20
+			#li $a2,20
+			add $a2, $0, $t2
+			li $a3,20
+			addi $t9, $0, 16711680		# Cor vermelho
+			jal rectangle
+		
+			lw $a0, 4($sp)
+			lw $a1, 8($sp)
+			lw $a2, 12($sp)
+			
+			li $v0, 4
+			la $a0, JogadaBomba
+			syscall
+			j chekarSeTodosBarcosAfundaramUtilizador
+			incrementar_a1_Utilizador:
+			addi $a1, $a1, 12 
+			j cicloVerArrayBarcoUtilizador
+		aguaJogadaUtilizador:
+		
+		div $t1, $t1, 4
+		div $t2, $t2, 40
+		mul $t1, $t1, 25
+		mul $t2, $t2, 25
+		add $t1, $t1, 260
+		#li $a0,20
+		add $a0, $0, $t1
+		li $a1,20
+		#li $a2,20
+		add $a2, $0, $t2
+		li $a3,20
+		addi $t9, $0, 65535 	# Cor aqua
+		jal rectangle
+		
+		lw $a0, 4($sp)
+		lw $a1, 8($sp)
+		lw $a2, 12($sp)
+		
+		la $t5, '0'
+		sw $t5, 0($s3)
+		#jal displayTabuleiroJogoPC
+		li $v0, 4
+		la $a0, JogadaAgua
+		syscall
+		
+		addi $t7, $0, 2
+		j validarVezJogada
+		
+		chekarSeTodosBarcosAfundaramUtilizador:
+		lw $a1, 8($sp)
+		ciclo_chekarSeTodosBarcosAfundaramUtilizador:
+		lw $t4, 0($a1)
+		lw $t5, 4($a1)
+		lw $t6, 8($a1)
+		bne $t5, $t6, vezUtilizador
+		bge $t4, 100, vitoriaUtilizador
+		add $a1, $a1, 12
+		j ciclo_chekarSeTodosBarcosAfundaramUtilizador
+	jogadaRepetidaUtilizador:
+	li $v0, 4
+	la $a0, JogadaRepetida
+	syscall
+	j vezUtilizador
+	
+	vezPC:
+	li $v0, 4
+	la $a0, vezJogarPC
+	syscall
+	lw $a0, 4($sp)
+	#jal gerarNumeroRandom
+	jal gerarLinhaColunaRandom
+	add $t1, $v0, $0
+	jal gerarLinhaColunaRandom
+	add $t2, $v0,$0
+	bge $t1, 10, vezPC
+	bge $t2, 10, vezPC
+	mul $t1, $t1, 4
+	mul $t2, $t2, 40
+	add $t3, $t1, $t2
+	bge $t3, 400, vezPC
+	
+	lw $s0, 16($sp)
+	lw $s1, 20($sp)
+	add $s1, $s1, $t3
+	lw $t4, 0($s1)
+	beq $t4, '0', jogadaRepetidaPC
+	beq $t4, 'X', jogadaRepetidaPC
+		add $s0, $s0, $t3
+		lw $t4, 0($s0)
+		beq $t4, '-', aguaJogadaPC
+		lw $a0, 4($sp)
+		cicloVerArrayBarcoPC:
+			lw $t6, 0($a0)
+			bne $t4, $t6, incrementar_a0_PC
+			lw $t3, 4($a0)
+			lw $t6, 8($a0)
+			addi $t6, $t6, 1
+			sw $t6, 8($a0)
+			la $t5, 'X'
+			sw $t5, 0($s1)
+			#jal displayTabuleiroJogo
+			
+			div $t1, $t1, 4
+			div $t2, $t2, 40
+			mul $t1, $t1, 25
+			mul $t2, $t2, 25
+			#li $a0,20
+			add $a0, $0, $t1
+			li $a1,20
+			#li $a2,20
+			add $a2, $0, $t2
+			li $a3,20
+			addi $t9, $0, 16711680		# Cor vermelho
+			jal rectangle
+		
+			lw $a0, 4($sp)
+			lw $a1, 8($sp)
+			lw $a2, 12($sp)
+			
+			j chekarSeTodosBarcosAfundaramPC
+			incrementar_a0_PC:
+			addi $a0, $a0, 12
+			j cicloVerArrayBarcoPC
+		aguaJogadaPC:
+		
+		div $t1, $t1, 4
+		div $t2, $t2, 40
+		mul $t1, $t1, 25
+		mul $t2, $t2, 25
+		#li $a0,20
+		add $a0, $0, $t1
+		li $a1,20
+		#li $a2,20
+		add $a2, $0, $t2
+		li $a3,20
+		addi $t9, $0, 65535 	# Cor aqua
+		jal rectangle
+		
+		lw $a0, 4($sp)
+		lw $a1, 8($sp)
+		lw $a2, 12($sp)
+		
+		la $t5, '0'
+		sw $t5, 0($s1)
+		#jal displayTabuleiroJogo
+		addi $t7, $0, 1
+		j validarVezJogada
+		
+		chekarSeTodosBarcosAfundaramPC:
+		lw $a0, 4($sp)
+		ciclo_chekarSeTodosBarcosAfundaramPC:
+		lw $t4, 0($a0)
+		lw $t5, 4($a0)
+		lw $t6, 8($a0)
+		bne $t5, $t6, vezPC
+		bge $t4, 100, vitoriaPC
+		add $a0, $a0, 12
+		j ciclo_chekarSeTodosBarcosAfundaramPC
+	jogadaRepetidaPC:
+	j vezPC
+j cicloJogoPC
+vitoriaUtilizador:
+lw $a0, 4($sp)
+lw $a1, 8($sp)
+lw $a2, 12($sp)
+lw $t5, 0($a2)
+addi $t4, $t5, 5
+sw $t4, 0($a2)
+lw $t5, 4($a2)
+addi $t4, $t5, -3
+blt $t4, 0, igualarDerrotaPC0
+sw $t4, 4($a2)
+j sairJogoPC
+igualarDerrotaPC0:
+add $t4, $0, $0
+sw $t4, 4($a2)
+j sairJogoPC
+vitoriaPC:
+lw $a0, 4($sp)
+lw $a1, 8($sp)
+lw $a2, 12($sp)
+lw $t5, 4($a2)
+addi $t4, $t5, 5
+sw $t4, 4($a2)
+lw $t5, 0($a2)
+addi $t4, $t5, -3
+blt $t4, 0, igualarDerrotaUtilizador0
+sw $t4, 0($a2)
+j sairJogoPC
+igualarDerrotaUtilizador0:
+add $t4, $0, $0
+sw $t4, 0($a2)
+j sairJogoPC
+sairJogoPC:
+zerarArrayBarcosPC:
+lw $a0, 4($sp)
+ciclo_zerarArrayBarcosPC:
+lw $t4, 0($a0)
+bge $t4, 100, zerarArrayBarcosUtilizador
+add $t4, $0, $0
+sw $t4, 0($a0)
+add $a0, $a0, 12
+j ciclo_zerarArrayBarcosPC
+zerarArrayBarcosUtilizador:
+lw $a1, 4($sp)
+ciclo_zerarArrayBarcosUtilizador:
+lw $t4, 0($a1)
+bge $t4, 100, sairJogoDepoisDeZerarPC
+add $t4, $0, $0
+sw $t4, 0($a1)
+add $a1, $a1, 12
+j ciclo_zerarArrayBarcosUtilizador
+sairJogoDepoisDeZerarPC:
+add $t4, $0, $0
+sw $t4, 0($a0)
+sw $t4, 0($a1)
+lw $ra, 0($sp)
+add $sp, $sp, 32
+jr $ra
+
+
+
+
+copiarTabuleiroCopia:
+# a0 -> copiaTabulerio
+# a1 -> tabuleiro
+#t1 -> i
+#t2 -> '0'
+add $a0, $s1, $0
+add $a1, $s0, $0
+add $t1, $0, $0
+#li $t2, '-'
+copiar_tabuleiroCopia_for:
+	lw $t2, 0($a1)
+	bge $t1, 100, sair_copiar_tabuleiroCopia_for		# i >= 100 sai do ciclo
+	sw $t2, 0($a0)
+	addi $a0, $a0, 4
+	addi $a1, $a1, 4
+	addi $t1, $t1, 1
+	j copiar_tabuleiroCopia_for
+sair_copiar_tabuleiroCopia_for:
+jr $ra
+
+
+
+zerarTabuleiroCopiaPC:
+# a0 -> copiaTabuleiroPC
+#t1 -> i
+#t2 -> '0'
+add $a0, $s3, $0
+add $t1, $0, $0
+li $t2, '-'
+zerar_tabuleiroCopiaPC_for:
+	bge $t1, 100, sair_zerar_tabuleiroCopiaPC_for		# i >= 100 sai do ciclo
+	sw $t2, 0($a0)
+	addi $a0, $a0, 4
+	addi $t1, $t1, 1
+	j zerar_tabuleiroCopiaPC_for
+sair_zerar_tabuleiroCopiaPC_for:
+jr $ra
+
+
+displayTabuleiroBitMap:
+#t7 -> i
+#t8 -> j
+#t5 -> X
+#t4 -> val do endere?o
+#t6 -> Y
+#t9 -> cor
+add $sp, $sp, -12
+sw $ra, 0($sp)
+la $s0, copiaTabuleiroPC
+la $s1, copiaTabuleiro
+sw $s0, 4($sp)
+sw $s1, 8($sp)
+addi $t5, $0, 0
+add $t7, $0, $0
+addi $t6, $0, 0
+addi $t9, $0, -1
+displayTabuleiroBitMap_1for:
+	bge $t7, 10, sair_displayTabuleiroBitMap_1for		# i >= 10 sai do ciclo
+	add $t8, $0, $0
+	displayTabuleiroBitMap_2for:
+		bge $t8, 10, sair_displayTabuleiroBitMap_2for		# j >= 10 sai do ciclo
+		lw $t4, 0($s1)
+
+		add $a0, $0, $t5
+		li $a1,20
+
+		add $a2, $0, $t6
+		li $a3,20
+		bne $t4, '-', bitMapComBarco
+		jal rectangle
+		j bitMapPc
+		bitMapComBarco:
+		addi $t9, $0, 200
+		jal rectangle
+		addi $t9, $0, -1
+		j bitMapPc
+
+		bitMapPc:
+		add $t5, $t5, 260
+		lw $t4, 0($s0)
+
+		add $a0, $0, $t5
+		li $a1,20
+
+		add $a2, $0, $t6
+		li $a3,20
+		add $t5, $t5, -260
+		jal rectangle
+		
+		addi $s0, $s0, 4
+		addi $s1, $s1, 4
+		add $t5, $t5, 25
+		addi $t8, $t8, 1
+		j displayTabuleiroBitMap_2for
+	sair_displayTabuleiroBitMap_2for:
+	addi $t5, $0, 0
+	add $t6, $t6, 25
+	addi $t7, $t7, 1
+	j displayTabuleiroBitMap_1for
+sair_displayTabuleiroBitMap_1for:
+lw $ra, 0($sp)
+add $sp, $sp, 12
+jr $ra
+
+
+displayTabuleiroJogoPC:
+#a0 -> copiaTabuleiroPC
+#t1 -> i
+#t2 -> j
+#t3 -> endere?o
+#t4 -> val do endere?o
+add $sp, $sp -4
+add $a0, $s3, $0
+sw $a0, 0($sp)
+#add $t3, $0, $0
+add $t1, $0, $0
+#add $t3, $a0, $0
+displayTabuleiroJogoPC_1for:
+	bge $t1, 10, sair_displayTabuleiroJogoPC_1for		# i >= 10 sai do ciclo
+	add $t2, $0, $0
+	displayTabuleiroJogoPC_2for:
+		bge $t2, 10, sair_displayTabuleiroJogoPC_2for		# j >= 10 sai do ciclo
+		#add $s0, $t3, $0
+		#add $t3, $a0, $0
+		li $v0, 4
+		lw $t4, 0($a0)
+		sw $t4, valCopiaTabuleiro
+		la $a0, valCopiaTabuleiro
+		syscall
+		#add $t3, $t3, 4
+		lw $a0, 0($sp)
+		addi $a0, $a0, 4
+		sw $a0, 0($sp)
+		addi $t2, $t2, 1
+		j displayTabuleiroJogoPC_2for
+	sair_displayTabuleiroJogoPC_2for:
+	li $v0, 4
+	la $a0, Enter
+	syscall
+	lw $a0, 0($sp)
+	addi $t1, $t1, 1
+	j displayTabuleiroJogoPC_1for
+sair_displayTabuleiroJogoPC_1for:
+li $v0, 4
+la $a0, Enter
+syscall
+add $sp, $sp, 4
 jr $ra
 
 
@@ -397,6 +1149,7 @@ gerarTabuleiro:
 # $a0 -> Size do Barco
 # $a1 -> Numero do Barco
 # $a2 -> array dos barcos
+# $a3 -> Endereco do tabuleiro
 # $t8 -> Posicoes das Pecas do Barco
 # $t1 -> posi??o do barco antes de chackar se vazia / posi??o do barco para add Letra
 # $t2 -> Valor na Pos do tabuleiro
@@ -410,7 +1163,7 @@ gerarTabuleiro:
 add $sp, $sp, -20	# Baixar a Stack
 sw $ra, 0($sp)		# Guardar o $ra desta fun??o
 add $a0, $t2, $0	# Guardar o Size do Barco em $a0
-add $a1, $t1, $0	# Guardar a Numero do Barco em $a1
+add $a1, $s2, $0	# Guardar a Numero do Barco em $a1
 add $a2, $s1, $0	# Endereco do barco
 add $a3, $s0, $0	# Endereco do tabuleiro
 sw $a0, 4($sp)		# Guardo o Size do Barco na stack pq vou perder o valor de $a0 noutras funcoes
@@ -730,7 +1483,7 @@ forAddBarco:
 	j forAddBarco
 addBarcoArrayBarcos:
 	lw $a0, 4($sp)		# Receber da stack o valor de $a0 (size do Braco)
-	lw $a1, 8($sp)		# Receber da stack a letra do barco
+	lw $a1, 8($sp)		# Receber da stack o Numero do barco
 	lw $a2, 12($sp)
 	lw $a3, 16($sp)
 	sw $a1, 0($a2)
