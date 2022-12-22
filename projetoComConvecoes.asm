@@ -13,13 +13,13 @@ teclaMenuErro:		.asciiz "Essa opcaoo nao existe no menu, insira um nova opcaoo \
 vezJogarPC:		.asciiz "Vez Do Computador \n"
 vezJogarUtilizador:	.asciiz "Vez Do Utilizador \n"
 editSizeBarcosMenu:	.asciiz "Editar tamanho dos Barcos? 1 -> Editar \n"
-editSizeBarcoOption:	.asciiz "0 -> Utilizar Tamanho Padrao / Tamanho maximo de um barco e 10 \n"
+editSizeBarcoOption:	.asciiz "0 -> Utilizar Tamanho Padrao / Tamanho maximo de um barco e 9 \n"
 editSizeBarco:		.asciiz "Editar tamanho do Barco - "
-editNumCarrier:		.asciiz "Insira o numero de barcos Carrier (max de barcos = 10)\n"
-editNumBattleship:	.asciiz "Insira o numero de barcos Battleship (max = 10)\n"
-editNumDestroyer:	.asciiz "Insira o numero de barcos Destroyer (max = 10)\n"
-editNumSubmarine:	.asciiz "Insira o numero de barcos Submarine (max = 10)\n"
-editNumPatrol:		.asciiz "Insira o numero de barcos Patrol (max = 10)\n"
+editNumCarrier:		.asciiz "Insira o numero de barcos Carrier (max de barcos = 9)\n"
+editNumBattleship:	.asciiz "Insira o numero de barcos Battleship (max = 9)\n"
+editNumDestroyer:	.asciiz "Insira o numero de barcos Destroyer (max = 9)\n"
+editNumSubmarine:	.asciiz "Insira o numero de barcos Submarine (max = 9)\n"
+editNumPatrol:		.asciiz "Insira o numero de barcos Patrol (max = 9)\n"
 barcoCarrier:		.asciiz "Carrier\n"
 barcoBattleship:	.asciiz "Battleship\n"
 barcoDestroyer:		.asciiz "Destroyer\n"
@@ -182,7 +182,7 @@ sw $ra, 0($sp)			# Guarda $ra na stack
 la $s0, tabuleiro		# Recebe o endereco do tabuleiro
 la $s1, barcos			# Recebe o endereco do array dos barcos
 la $s3, barcosPC		# Recebe o endereco do array dos barcos do PC
-add $s4, $0, $0			# Inicializa $s4 = 0
+addi $s4, $0, 1			# Inicializa $s4 = 1
 add $s5, $0, $0			# Inicializa $s5 = 0		
 add $s6, $0, $0			# Inicializa $s6 = 0
 la $s7, arrayPontuacao		# Recebe o endereco do array de pontuacoes
@@ -226,6 +226,7 @@ la $a0, editNumCarrier		# Escreve o que tem na label editNumCarrier
 syscall
 li $v0, 5			# recebe um inteiro
 syscall
+bge $v0, 10, numCarrier
 add $t0, $v0, $0		# iguala $t0 ao inteiro inserido pelo utilizador
 lw $s5, 24($sp)			# Recebe o valor de $s5(I) (da stack)
 cicloNumCarrier:		# Ciclo para o barco carrier
@@ -261,6 +262,7 @@ la $a0, editNumBattleship
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, numBattleship
 add $t0, $v0, $0		# Guarda em $t0 o inteiro do utilizador
 lw $s5, 24($sp)			# recebe I
 cicloNumBattleship:
@@ -296,6 +298,7 @@ la $a0, editNumDestroyer
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, numDestroyer
 add $t0, $v0, $0		# recebe o inteiro do utilizador
 lw $s5, 24($sp)			# recebe I
 cicloNumDestroyer:
@@ -331,6 +334,7 @@ la $a0, editNumSubmarine
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, numSubmarine
 add $t0, $v0, $0		# recebe o inteiro do utilizador
 lw $s5, 24($sp)			# recebe I
 cicloNumSubmarine:
@@ -366,6 +370,7 @@ la $a0, editNumPatrol
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, numPatrol
 add $t0, $v0, $0		# recebe o inteiro do utilizador
 lw $s5, 24($sp)			# recebe o I
 cicloNumPatrol:
@@ -1518,6 +1523,7 @@ barcosEdit:
 # $t2 -> tamanho do barco
 # $t1 -> valores do size do barco / letra do barco
 
+carrierBarcoEditMenu:
 li $v0, 4
 la $a0, editSizeBarcoOption
 syscall
@@ -1529,6 +1535,7 @@ la $a0, barcoCarrier
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, carrierBarcoEditMenu
 add $t2, $v0, $0
 
 carrierBarcoEdit:
@@ -1543,6 +1550,7 @@ addi $t1, $0, 5			# iguala $t1 ao tamanho padrao do barco
 skipEditCarrier:
 sw $t1, 4($t0)			# guarda o tamanho do barco na segunda posicao do array do barco
 
+battleshipBarcoEditMenu:
 li $v0, 4
 la $a0, editSizeBarco
 syscall
@@ -1551,6 +1559,7 @@ la $a0, barcoBattleship
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, battleshipBarcoEditMenu
 add $t2, $v0, $0
 
 battleshipBarcoEdit:
@@ -1565,6 +1574,7 @@ addi $t1, $0, 4
 skipEditBattleship:
 sw $t1, 4($t0)
 
+destroyerBarcoEditMenu:
 li $v0, 4
 la $a0, editSizeBarco
 syscall
@@ -1573,6 +1583,7 @@ la $a0, barcoDestroyer
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, destroyerBarcoEditMenu
 add $t2, $v0, $0
 
 destroyerBarcoEdit:
@@ -1587,6 +1598,7 @@ addi $t1, $0, 3
 skipEditDestroyer:
 sw $t1, 4($t0)
 
+submarineBarcoEditMenu:
 li $v0, 4
 la $a0, editSizeBarco
 syscall
@@ -1595,6 +1607,7 @@ la $a0, barcoSubmarine
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, submarineBarcoEditMenu
 add $t2, $v0, $0
 
 submarineBarcoEdit:
@@ -1609,6 +1622,7 @@ addi $t1, $0, 3
 skipEditSubmarine:
 sw $t1, 4($t0)
 
+patrolBarcoEditMenu:
 li $v0, 4
 la $a0, editSizeBarco
 syscall
@@ -1617,6 +1631,7 @@ la $a0, barcoPatrol
 syscall
 li $v0, 5
 syscall
+bge $v0, 10, patrolBarcoEditMenu
 add $t2, $v0, $0
 
 patrolBarcoEdit:
