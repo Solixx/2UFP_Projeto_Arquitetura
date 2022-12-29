@@ -1182,7 +1182,7 @@ gerarPos:
 	beq $t3, 0, validacoesHor
 	validacoesVert:
 		addi $t4, $0, 100		# Igualo $t4 = 100 (valor maximo do tabuleiro sem ser multiplicado por 4 / 0-100)
-		add $t5, $a0, -1		# Size do barco -1
+		add $t5, $a0, -1		# Size do barco -1 (precisa de ser -1 por causa dos arrays comecarem em 0 ent um barco de 5 vai de 0 a 4 no array)
 		mul $t5, $t5, 10		# (Size do barco-1) * 10
 		sub $t4, $t4, $t5		# 100 - ((Size do barco-1) * 10) / Usado para saber o limite do numero gerado na fun??o gerarNumeroRandomVert (tabuleiro sem ser multiplicado por 4 / 0-100)
 		jal gerarNumeroRandomVert	# Fun??o que gera Numero entre 0 < 60
