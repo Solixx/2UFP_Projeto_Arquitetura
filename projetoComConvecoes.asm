@@ -87,9 +87,8 @@ fase1Main:
 # $s0 -> endere?o do tabuleiro
 # $s2 -> numero do barco
 # $s1 -> endere?o dos barcos
-# $t1 -> numero do barco 
+# $s2 -> numero do barco 
 # $t2 -> tamanho do barco 
-# $t3 -> letra do Barco 
 
 addi $sp, $sp, -16		# Baixa stack em 16
 sw $ra, 0($sp)			# Guarda $ra na posicao 0 da stack
