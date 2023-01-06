@@ -176,6 +176,8 @@ jal gerarTabuleiro		# Chama a funcao gerarTabuleiro (funcao que gera um barco no
 add $a0, $s0, $0
 jal displayTabuleiro		# Chama a funcao para dar display ao tabuleiro
 la $s1, barcos			# Recebe o endereco do array dos barcos para $s1
+add $a0, $s1, $0		# recebe em $a0 o valor de $s1
+add $a1, $s0, $0		# recebe em $a1 o valor de $s0	
 jal jogo			# Chama a funcao do jogo
 
 lw $ra, 0($sp)			# Recebe o $ra (da stack)
@@ -473,84 +475,96 @@ jogo:
 # $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
 # $t6 -> contadores de barcos
 
-add $sp, $sp, -16		# baixa a stack
+addi $sp, $sp, -40		# baixa a stack
 sw $ra, 0($sp)			# guarda $ra
-add $a0, $s1, $0		# recebe em $a0 o valor de $s1
-add $a1, $s0, $0		# recebe em $a1 o valor de $s0	
+#add $a0, $s1, $0		# recebe em $a0 o valor de $s1
+#add $a1, $s0, $0		# recebe em $a1 o valor de $s0	
+sw $s0, 4($sp)
+sw $s1, 8($sp)
+sw $s2, 12($sp)
+sw $s3, 16($sp)
+sw $s4, 20($sp)
+sw $s5, 24($sp)
+sw $s6, 28($sp)
+sw $a0, 32($sp)
+sw $a1, 36($sp)
 la $s0, copiaTabuleiro		# recebe o endereco de copiaTabuleiro
-sw $a0, 4($sp)			# guarda $a0 na stack
-sw $a1, 8($sp)			# guarda $a1 na stack
-sw $s0, 12($sp)			# guarda $s0 na stack
+add $a0, $s0, $0
 jal zerarTabuleiroCopia		# chama a funcao de zerarTabuleiroCopia cria e inicializa a copiaTabuleiro a '-'
+lw $a0, 32($sp)
 cicloJogo:
 	jal displayTabuleiroJogo	# chama funcao de display do tabuleiro do jogo (copiaTabuleiro)
 	posUtilizador:
-	lw $a0, 4($sp)			# recebe o endereco dos barcos
+	lw $a1, 32($sp)
+	lw $a1, 36($sp)
 	li $v0, 12			# le carater do teclado (linha do tabuleiro)
 	syscall
-	add $t1, $v0, $0		# iguala $t1 ao carater inserido pelo utilzaidor
+	add $s1, $v0, $0		# iguala $s1 ao carater inserido pelo utilzaidor
 	li $v0, 5			# le inteiro do teclado (coluna do tabuleiro) 
 	syscall
-	add $t2, $v0, $0		# iguala $t2 ao inteiro inserido pelo utilzaidor	
-	addi $t1, $t1, -97		# Passar de A -> 1, b -> 2 etc... (97 e o valor de A)
-	bge $t1, 10, posUtilizador	# if(valor da letra >= 10) esta fora do tabuleiro volta a pedir todo de novo ao utilzador
-	bge $t2, 10, posUtilizador	# if(coluna >= 10) esta fora do tabuleiro volta a pedir todo de novo ao utilzador
-	mul $t1, $t1, 4			# multiplica o valor da letra * 4 para usar nas posicoes do array dos tabuleiros (4 -> por ser coluna)
-	mul $t2, $t2, 40		# multiplica o valor da letra * 40 para usar nas posicoes do array dos tabuleiros (40 -> por ser linha)
-	add $t3, $t1, $t2		# soma todo para $t3 e isto e a posicao no array dos tabuleiros
-	bge $t3, 400, posUtilizador	# if ($t3 >= 400) esta fora do tabuleiro volta a pedir todo de novo ao utilizador
+	add $s2, $v0, $0		# iguala $s2 ao inteiro inserido pelo utilzaidor	
+	addi $s1, $s1, -97		# Passar de A -> 1, b -> 2 etc... (97 e o valor de A)
+	bge $s1, 10, posUtilizador	# if(valor da letra >= 10) esta fora do tabuleiro volta a pedir todo de novo ao utilzador
+	bge $s2, 10, posUtilizador	# if(coluna >= 10) esta fora do tabuleiro volta a pedir todo de novo ao utilzador
+	mul $s1, $s1, 4			# multiplica o valor da letra * 4 para usar nas posicoes do array dos tabuleiros (4 -> por ser coluna)
+	mul $s2, $s2, 40		# multiplica o valor da letra * 40 para usar nas posicoes do array dos tabuleiros (40 -> por ser linha)
+	add $s3, $s1, $s2		# soma todo para $s3 e isto e a posicao no array dos tabuleiros
+	bge $s3, 400, posUtilizador	# if ($s3 >= 400) esta fora do tabuleiro volta a pedir todo de novo ao utilizador
 	
-	lw $a1, 8($sp)			# recebe o endereco do tabuleiro
-	la $t0, copiaTabuleiro		# recebe o endereco da copiaTabuleiro
-	add $t0, $t0, $t3		# avanca para a posicao que o utilizador escolheu no array copiaTabuleiro
-	lw $t4, 0($t0)			# recebe o valor dessa posicao
-	bne $t4, '-', jogadaRepetida	# if($t4 != '-') esta posicaoja foi inserida anteriormente 
-		add $a1, $a1, $t3			# avanca para a posicao inserida pelo utilizador no tabuleiro
-		lw $t4, 0($a1)				# recebe o valor em $t4
-		beq $t4, '-', aguaJogada		# if($t4 == '-') nao havia barco nessa posicao ent e agua
-		lw $a0, 4($sp)				# else{ recebe o endereco do array de barcos
+	#lw $a1, 8($sp)			# recebe o endereco do tabuleiro
+	la $s0, copiaTabuleiro		# recebe o endereco da copiaTabuleiro
+	add $s0, $s0, $s3		# avanca para a posicao que o utilizador escolheu no array copiaTabuleiro
+	lw $s4, 0($s0)			# recebe o valor dessa posicao
+	bne $s4, '-', jogadaRepetida	# if($s4 != '-') esta posicaoja foi inserida anteriormente 
+		add $a1, $a1, $s3			# avanca para a posicao inserida pelo utilizador no tabuleiro
+		lw $s4, 0($a1)				# recebe o valor em $s4
+		beq $s4, '-', aguaJogada		# if($s4 == '-') nao havia barco nessa posicao ent e agua
+		#lw $a0, 4($sp)				# else{ recebe o endereco do array de barcos
 		cicloVerArrayBarco:
-			lw $t6, 0($a0)				# recebe o valor do endereco de barcos	
-			bne $t4, $t6, incrementar_a0		# if(barco da posicao utilizador != barco do array) continua a avancar no array ate encontrar o barco certo
-			lw $t3, 4($a0)				# se os barcos sao iguais, recebe o tamanho do barco do array de barcos
-			lw $t6, 8($a0)				# recebe o contador de quantas pecas desse barco foram destruidas
-			addi $t6, $t6, 1			# incrementa o numero de pecas destruidas
-			sw $t6, 8($a0)				# guarda no array
-			la $t5, 'X'				# $t5 = 'X'
-			sw $t5, 0($t0)				# guarda 'X' no copiaTabuleiro na posicao do utilizador
+			lw $s6, 0($a0)				# recebe o valor do endereco de barcos	
+			bne $s4, $s6, incrementar_a0		# if(barco da posicao utilizador != barco do array) continua a avancar no array ate encontrar o barco certo
+			lw $s3, 4($a0)				# se os barcos sao iguais, recebe o tamanho do barco do array de barcos
+			lw $s6, 8($a0)				# recebe o contador de quantas pecas desse barco foram destruidas
+			addi $s6, $s6, 1			# incrementa o numero de pecas destruidas
+			sw $s6, 8($a0)				# guarda no array
+			la $s5, 'X'				# $s5 = 'X'
+			sw $s5, 0($s0)				# guarda 'X' no copiaTabuleiro na posicao do utilizador
 			jal displayTabuleiroJogo		# chama funcao de display do tabuleiro
-			bne $t3, $t6, acertouJogada		# if(tamanho do barco != contador de pecas destruidas) barco ainda nao afundou
+			bne $s3, $s6, acertouJogada		# if(tamanho do barco != contador de pecas destruidas) barco ainda nao afundou
 				li $v0, 4			# else escreve "afundou" na consola
 				la $a0, JogadaAfundou
 				syscall
+				lw $a0, 32($sp)
 			acertouJogada:
 			li $v0, 4				# escreve "bomba" na consola
 			la $a0, JogadaBomba
 			syscall
+			lw $a0, 32($sp)
 			j chekarSeTodosBarcosAfundaram		# jump para ver se todos os barcos do array ja foram afundados
 			incrementar_a0:
 			addi $a0, $a0, 12 			# incrementa endereco de barcos para continuar no ciclo para ver os barcos do array e o barco do tabuleiro acertado
 			j cicloVerArrayBarco
 		aguaJogada:
-		la $t5, '0'			# $t5 = '0'
-		sw $t5, 0($t0)			# guarda '0' no copiaTabuleiro na posicao do utilizador
+		la $s5, '0'			# $s5 = '0'
+		sw $s5, 0($s0)			# guarda '0' no copiaTabuleiro na posicao do utilizador
 		jal displayTabuleiroJogo	# chama funcao de display do tabuleiro
 		li $v0, 4			# escreve "agua" na consola
 		la $a0, JogadaAgua
 		syscall
+		lw $a0, 32($sp)
 		j posUtilizador			# volta a pedir as posicoes ao utilizador
 
 		chekarSeTodosBarcosAfundaram:
-		lw $a0, 4($sp)			# recebe o endereco dos barcos
+		#lw $a0, 4($sp)			# recebe o endereco dos barcos
 		# t4 -> barco
 		# t5 -> size barco
 		# t6 -> contador barco
 		ciclo_chekarSeTodosBarcosAfundaram:	
-		lw $t4, 0($a0)				# recebe o numero do barcos 
-		lw $t5, 4($a0)				# recebe o tamanho do barco
-		lw $t6, 8($a0)				# recebe o contador de pecas destruidas do barco
-		bne $t5, $t6, posUtilizador		# if($t5 != $t6) existe pelo menis um barco que ainda nao afundou ent o jogo ainda n acaba
-		bge $t4, 100, sairJogo			# if($t4 >= 100) todos os barcos afundaram (100 e um valor escolhido por mim como ultimo valor do array de barcos se chegar ate este valor quer dizer q todos os barco afundaram)
+		lw $s4, 0($a0)				# recebe o numero do barcos 
+		lw $s5, 4($a0)				# recebe o tamanho do barco
+		lw $s6, 8($a0)				# recebe o contador de pecas destruidas do barco
+		bne $s5, $s6, posUtilizador		# if($s5 != $s6) existe pelo menis um barco que ainda nao afundou ent o jogo ainda n acaba
+		bge $s4, 100, sairJogo			# if($s4 >= 100) todos os barcos afundaram (100 e um valor escolhido por mim como ultimo valor do array de barcos se chegar ate este valor quer dizer q todos os barco afundaram)
 		add $a0, $a0, 12			# incremenat o array de barcos (12 em 12 (assembly) / 4 em 4 (C)) pois ada barco tem 4 posicoes reservadas para si no array
 		j ciclo_chekarSeTodosBarcosAfundaram	# chama o ciclo de novo
 	jogadaRepetida:
@@ -561,23 +575,30 @@ cicloJogo:
 j cicloJogo
 sairJogo:
 zerarArrayBarcos:
-lw $a0, 4($sp)		# recebe o endereco dos barcos
+lw $a0, 32($sp)		# recebe o endereco dos barcos
 # t4 -> barco
 # t5 -> size barco
 # t6 -> contador barco
 ciclo_zerarArrayBarcos:
-lw $t4, 0($a0)				# recebe o numero do barco
-bge $t4, 100, sairJogoDepoisDeZerar	# if($t4 >= 100) ja zerou todos os barcos
-add $t4, $0, $0				# iguala $t4 = 0
-sw $t4, 0($a0)				# insere no array de barcos
+lw $s4, 0($a0)				# recebe o numero do barco
+bge $s4, 100, sairJogoDepoisDeZerar	# if($s4 >= 100) ja zerou todos os barcos
+add $s4, $0, $0				# iguala $s4 = 0
+sw $s4, 0($a0)				# insere no array de barcos
 add $a0, $a0, 12			# avanca 12 posicoes no array
 j ciclo_zerarArrayBarcos		# chama o ciclo de novo
 
 sairJogoDepoisDeZerar:
-add $t4, $0, $0			# iguala $t4 = 0
-sw $t4, 0($a0)			# guarda no aray de barcos (para substituir o 100 por 0)
+add $s4, $0, $0			# iguala $s4 = 0
+sw $s4, 0($a0)			# guarda no aray de barcos (para substituir o 100 por 0)
 lw $ra, 0($sp)			# recebe $ra
-add $sp, $sp, 16		# sube a stack
+lw $s0, 4($sp)
+lw $s1, 8($sp)
+lw $s2, 12($sp)
+lw $s3, 16($sp)
+lw $s4, 20($sp)
+lw $s5, 24($sp)
+lw $s6, 28($sp)
+add $sp, $sp, 40		# sube a stack
 jr $ra				# returna da funcao
 
 
@@ -597,6 +618,8 @@ jogoPC:
 # $t5 -> Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
 # $t6 -> contadores de barcos
 # $t7 -> vez de jogar (1 -> Utilizador / 2-> PC)
+
+
 add $sp, $sp, -32		# baixar a stack
 sw $ra, 0($sp)			# guardar $ra na stack
 add $a0, $s1, $0		# $a0 recebe o valor de $s1 (endereco do aray dos barcos)
@@ -1100,53 +1123,55 @@ add $sp, $sp, 4
 jr $ra
 
 displayTabuleiroJogo:
-#s0 -> copiaTabuleiro
+#t0 -> copiaTabuleiro
 #t1 -> i
 #t2 -> j
 #t4 -> val do endere?o
 # $t5 -> valor da posicao do array tabuleiro
 
-add $sp, $sp, -4
-la $s0, copiaTabuleiro
-sw $s0, 0($sp)
+addi $sp, $sp, -8
+sw $a0, 4($sp)
+la $t0, copiaTabuleiro
+sw $t0, 0($sp)
 add $t1, $0, $0
 displayTabuleiroJogo_1for:
 	bge $t1, 10, sair_displayTabuleiroJogo_1for		# i >= 10 sai do ciclo
 	add $t2, $0, $0
 	displayTabuleiroJogo_2for:
 		bge $t2, 10, sair_displayTabuleiroJogo_2for		# j >= 10 sai do ciclo
-		lw $t4, 0($s0)				# recebo o valor do copiaTabuleiro
+		lw $t4, 0($t0)				# recebo o valor do copiaTabuleiro
 		beq $t4, '-', printStringJogo		# if($t4 == '-') e string quero dar print a uma string
 		beq $t4, '0', printStringJogo		# if($t4 == '0') e string quero dar print a uma string
 		beq $t4, 'X', printStringJogo		# if($t4 == 'X') e string quero dar print a uma string
 		li $v0, 1
 		move $a0, $t4				# else{ e inteiro movo o valor para $a0 e escrevo na consola
 		syscall
-		lw $s0, 0($sp)
+		lw $t0, 0($sp)
 		j incrementarS0
 		printStringJogo:
 		li $v0, 4
 		sw $t4, valCopiaTabuleiro		# guardo o valor num arrray auxiliar para depois escrever como string
 		la $a0, valCopiaTabuleiro		# $a0 recebe o endereco desse array auxiliar e escrever o seu valor na consola
 		syscall
-		lw $s0, 0($sp)
+		lw $t0, 0($sp)
 		incrementarS0:
-		addi $s0, $s0, 4
-		sw $s0, 0($sp)
+		addi $t0, $t0, 4
+		sw $t0, 0($sp)
 		addi $t2, $t2, 1
 		j displayTabuleiroJogo_2for
 	sair_displayTabuleiroJogo_2for:
 	li $v0, 4
 	la $a0, Enter
 	syscall
-	lw $s0, 0($sp)
+	lw $t0, 0($sp)
 	addi $t1, $t1, 1
 	j displayTabuleiroJogo_1for
 sair_displayTabuleiroJogo_1for:
 li $v0, 4
 la $a0, Enter
 syscall
-add $sp, $sp, 4
+lw $a0, 4($sp)
+addi $sp, $sp, 8
 jr $ra
 
 zerarTabuleiroCopia:
@@ -1154,7 +1179,9 @@ zerarTabuleiroCopia:
 #t9 -> i
 #t2 -> '-'
 
-add $a0, $s0, $0
+addi $sp, $sp, -4
+sw $a0, 0($sp)
+#add $a0, $s0, $0
 add $t9, $0, $0
 li $t2, '-'
 zerar_tabuleiroCopia_for:
@@ -1164,6 +1191,8 @@ zerar_tabuleiroCopia_for:
 	addi $t9, $t9, 1
 	j zerar_tabuleiroCopia_for
 sair_zerar_tabuleiroCopia_for:
+lw $a0, 0($sp)
+addi $sp, $sp, 4
 jr $ra
 
 

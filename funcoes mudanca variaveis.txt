@@ -1,4 +1,4 @@
-GerarTabuleiro:
+gerarTabuleiro:
 t8 -> s0
 t1 -> s1
 t2 -> s2
@@ -7,3 +7,5 @@ t5 -> s4
 t6 -> s5
 t7 -> s6
 t9 -> s7
+
+jogo:
