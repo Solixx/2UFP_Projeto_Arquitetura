@@ -9,15 +9,34 @@ t7 -> s6
 t9 -> s7
 
 jogo:
-$t1 -> $s1
-$t2 -> $s2
-$t3 -> $s3
-$t4 -> $s4
-$t5 -> $s5
-$t6 -> $s6
+$t1 -> $s1		char coluna
+$t2 -> $s2		numero linha
+$t3 -> $s3		posi??o escolhida pelo utilizador final / size do barco acertado
+$t4 -> $s4		valores dos tabuleiros
+$t5 -> $s5		Valor a por no tabuleiro (X -> Bomba / 0 -> Agua)
+$t6 -> $s6		contadores de barcos
 
 fase2Main:
 $s0 -> endereço tabulerio / endereço tabuleiroPC
 $t4 -> pode ser um $t nao tem nenhum jal
 $s7 -> Editar tamanho de barcos ou nao (1 -> editar) / numero de barcos (menu utilizador) & endereço do array de pontuacoes
 $t0 -> $s7
+
+jogoPC:
+$s0		endereco do tabulerio / endereco do tabuleiroPC
+$s1		endereco do copiaTabuleiro / endereco do copiaTabuleiroPC
+$s2 -> $s0
+$s3 -> $s1
+$t1 -> $s2
+$t2 -> $s3
+$t3 -> $s4
+$t4 -> $s5
+$t5 -> $s6
+$t6 -> $s7
+
+displayTabuleiroBitMap:
+$t7 -> $s2
+$t8 -> $s3
+$t5 -> $s4
+$t4 -> $s5
+$t6 -> $s6

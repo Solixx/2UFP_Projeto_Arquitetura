@@ -256,6 +256,10 @@ add $a0, $s0, $0
 jal zerarTabuleiro		# Chama a funcao para inicializar o tabuleir a '-'
 
 numCarrier:
+la $s1, barcos
+la $s3, barcosPC
+add $s5, $0, $0
+add $s6, $0, $0
 li $v0, 4			# Print String
 la $a0, editNumCarrier		# Escreve o que tem na label editNumCarrier
 syscall
@@ -281,27 +285,31 @@ add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro		# Chama a funcao de gerarTabuleiro 
 #Gerar Carrier PC
 #lw $s1, 16($sp)			# Recebe o endereco dos barcos do PC (da stack)
-add $s1, $s1, $s6		# Avanca $s6 posicoes do array (12 em 12 (assembly) /  4 em 4 (C))
+add $s3, $s3, $s6		# anda $s6 posicoes do array ( de 12 em 12 (assembly) / de 4 em 4 (C))
 la $t5, carrier			# Rece o endereco do barco carrier
 lw $t2, 4($t5)			# Recebe o tamanho do barco
 #lw $s0, 8($sp)			# Recebe o endereco do tabuleiro do PC (da stack)
 la $s0, tabuleiroPC
 add $a0, $t2, $0		# Guardar o Size do Barco em $a0
 add $a1, $s2, $0		# Guardar a Numero do Barco em $a1
-add $a2, $s1, $0		# Endereco do barco
+add $a2, $s3, $0		# Endereco do barco
 add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro		# Chama a funcao de gerarTabuleiro 
 lw $s0, 36($sp)			# volta a reeber o endereco do tabuleiro Utilizador
 #lw $s2, 36($sp)			# Recebe o numero atual do barco que vai ser usado para o tabuleiro
-addi $s2, $s2, 1		# Inrementa $s2++
+addi $s2, $s2, 1		# Inrementa $s2++ (numero do barco no tabuleiro)
 #sw $s2, 36($sp)			# Guarda $s2 na stack
 addi $s4, $s4, 1		# Incrementa $s4++ (contador de barcos)
 #sw $s4, 20($sp)			# Guardar o valor de $s4 na stack
 addi $s5, $s5, 1		# Inrecementa $s5++ (I)
+sub $s1, $s1, $s6
+sub $s3, $s3, $s6
 addi $s6, $s6, 12		# Incrementa $s6 + 12 (posicoe sdo array de barcos)
 j cicloNumCarrier		# Volta ao ciclo
 
 numBattleship:
+la $s1, barcos
+la $s3, barcosPC
 add $s5, $0, $0
 li $v0, 4			
 la $a0, editNumBattleship	
@@ -328,14 +336,14 @@ add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 #lw $s1, 16($sp)			# recebe endereco barcos PC
-add $s1, $s1, $s6		# avanca posicoes
+add $s3, $s3, $s6		# anda $s6 posicoes do array ( de 12 em 12 (assembly) / de 4 em 4 (C))
 la $t5, battleship
 lw $t2, 4($t5)			# recebe tamanho barco
 #lw $s0, 8($sp)
 la $s0, tabuleiroPC
 add $a0, $t2, $0		# Guardar o Size do Barco em $a0
 add $a1, $s2, $0		# Guardar a Numero do Barco em $a1
-add $a2, $s1, $0		# Endereco do barco
+add $a2, $s3, $0		# Endereco do barco
 add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 lw $s0, 36($sp)
@@ -345,10 +353,14 @@ addi $s2, $s2, 1		# incremenat
 addi $s4, $s4, 1		# contador de barcos +1
 #sw $s4, 20($sp)			# guarda
 addi $s5, $s5, 1		# I ++
+sub $s1, $s1, $s6
+sub $s3, $s3, $s6
 addi $s6, $s6, 12		# incrmenat posicoes (array de barcos)
 j cicloNumBattleship
 
 numDestroyer:
+la $s1, barcos
+la $s3, barcosPC
 add $s5, $0, $0
 li $v0, 4
 la $a0, editNumDestroyer
@@ -375,14 +387,14 @@ add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 #lw $s1, 16($sp)			# recebe endereco barcos do PC
-add $s1, $s1, $s6		# incremenat $S6 posicoes
+add $s3, $s3, $s6		# anda $s6 posicoes do array ( de 12 em 12 (assembly) / de 4 em 4 (C))
 la $t5, destroyer
 lw $t2, 4($t5)			# recebe tamanho do barco
 #lw $s0, 8($sp)
 la $s0, tabuleiroPC
 add $a0, $t2, $0		# Guardar o Size do Barco em $a0
 add $a1, $s2, $0		# Guardar a Numero do Barco em $a1
-add $a2, $s1, $0		# Endereco do barco
+add $a2, $s3, $0		# Endereco do barco
 add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 lw $s0, 36($sp)
@@ -392,10 +404,14 @@ addi $s2, $s2, 1		# $s2++
 addi $s4, $s4, 1		# numero de barcos ++
 #sw $s4, 20($sp)			# guarda
 addi $s5, $s5, 1		# i++
+sub $s1, $s1, $s6
+sub $s3, $s3, $s6
 addi $s6, $s6, 12		# incrementa posicoes do array de barcos +12
 j cicloNumDestroyer
 
 numSubmarine:
+la $s1, barcos
+la $s3, barcosPC
 add $s5, $0, $0
 li $v0, 4
 la $a0, editNumSubmarine
@@ -422,14 +438,14 @@ add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC
 #lw $s1, 16($sp)			# recebe endereco de barcos PC
-add $s1, $s1, $s6		# incremenat $s6 posicos no array
+add $s3, $s3, $s6		# anda $s6 posicoes do array ( de 12 em 12 (assembly) / de 4 em 4 (C))
 la $t5, submarine	
 lw $t2, 4($t5)			# recebe tamanho do barco
 #lw $s0, 8($sp)
 la $s0, tabuleiroPC
 add $a0, $t2, $0		# Guardar o Size do Barco em $a0
 add $a1, $s2, $0		# Guardar a Numero do Barco em $a1
-add $a2, $s1, $0		# Endereco do barco
+add $a2, $s3, $0		# Endereco do barco
 add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 lw $s0, 36($sp)
@@ -439,10 +455,14 @@ addi $s2, $s2, 1		# incremenat $s2++
 addi $s4, $s4, 1		# incrementa o contador de barcos
 #sw $s4, 20($sp)			# guarda na stack $s4
 addi $s5, $s5, 1		# i++
+sub $s1, $s1, $s6
+sub $s3, $s3, $s6
 addi $s6, $s6, 12		# increenta o avanco de posicoes do array de barcos
 j cicloNumSubmarine
 
 numPatrol:
+la $s1, barcos
+la $s3, barcosPC
 add $s5, $0, $0
 li $v0, 4
 la $a0, editNumPatrol
@@ -469,14 +489,14 @@ add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 #Gerar Carrier PC	
 #lw $s1, 16($sp)			# recebe o endereco de barcos PC
-add $s1, $s1, $s6		# avanca $s6 posicoes no array
+add $s3, $s3, $s6		# anda $s6 posicoes do array ( de 12 em 12 (assembly) / de 4 em 4 (C))
 la $t5, patrol
 lw $t2, 4($t5)			# recebe o tamanho do barco
 #lw $s0, 8($sp)
 la $s0, tabuleiroPC
 add $a0, $t2, $0		# Guardar o Size do Barco em $a0
 add $a1, $s2, $0		# Guardar a Numero do Barco em $a1
-add $a2, $s1, $0		# Endereco do barco
+add $a2, $s3, $0		# Endereco do barco
 add $a3, $s0, $0		# Endereco do tabuleiro
 jal gerarTabuleiro
 lw $s0, 36($sp)
@@ -486,6 +506,8 @@ addi $s2, $s2, 1		# incrementa $s2++
 addi $s4, $s4, 1		# contador de barcos ++
 #sw $s4, 20($sp)			# guarda na stacl
 addi $s5, $s5, 1		# i++
+sub $s1, $s1, $s6
+sub $s3, $s3, $s6
 addi $s6, $s6, 12		# incrementa o avanco de posicoes no array de barcos
 j cicloNumPatrol
 
@@ -501,10 +523,15 @@ jal displayTabuleiro
 
 #lw $s1, 12($sp)			# recebe o endereco do array de barcos
 #lw $s3, 16($sp) 		# recebe o endereco do array de barcos do PC
+la $s1, barcos
+la $s3, barcosPC
+la $s7, arrayPontuacao		# Recebe o endereco do array de pontuacoes
+add $a0, $s1, $0		# $a0 recebe o valor de $s1 (endereco do aray dos barcos)
+add $a2, $s7, $0		# $a2 recebe o valor de $s7 (endereco do aray de pontuacoes)
+add $a1, $s3, $0		# $a1 recebe o valor de $s3 (endereco do aray dos barcosPC)
 jal jogoPC			# chama a funcao do jogo (jogoPC)
 	
 	
-la $s7, arrayPontuacao		# Recebe o endereco do array de pontuacoes
 li $v0, 4			
 la $a0, pontosUtilizador
 syscall
@@ -527,6 +554,14 @@ la $a0, Enter
 syscall
 
 lw $ra, 0($sp)			# recebe o $ra
+lw $s0, 4($sp)
+lw $s1, 8($sp)
+lw $s2, 12($sp)
+lw $s3, 16($sp)
+lw $s4, 20($sp)
+lw $s5, 24($sp)
+lw $s6, 28($sp)
+lw $s7, 32($sp)
 addi $sp, $sp, 40		# sube a stack
 jr $ra
 
@@ -687,145 +722,174 @@ jogoPC:
 # $t7 -> vez de jogar (1 -> Utilizador / 2-> PC)
 
 
-add $sp, $sp, -32		# baixar a stack
+addi $sp, $sp, -56		# baixar a stack
 sw $ra, 0($sp)			# guardar $ra na stack
-add $a0, $s1, $0		# $a0 recebe o valor de $s1 (endereco do aray dos barcos)
-add $a2, $s7, $0		# $a2 recebe o valor de $s7 (endereco do aray de pontuacoes)
-add $a1, $s3, $0		# $a1 recebe o valor de $s3 (endereco do aray dos barcosPC)
+#add $a0, $s1, $0		# $a0 recebe o valor de $s1 (endereco do aray dos barcos)
+#add $a2, $s7, $0		# $a2 recebe o valor de $s7 (endereco do aray de pontuacoes)
+#add $a1, $s3, $0		# $a1 recebe o valor de $s3 (endereco do aray dos barcosPC)
+sw $s0, 4($sp)
+sw $s1, 8($sp)
+sw $s2, 12($sp)
+sw $s3, 16($sp)
+sw $s4, 20($sp)
+sw $s5, 24($sp)
+sw $s6, 28($sp)
+sw $s7, 32($sp)
 la $s0, tabuleiro
 la $s1, copiaTabuleiro
-la $s2, tabuleiroPC
-la $s3, copiaTabuleiroPC
-sw $a0, 4($sp)
-sw $a1, 8($sp)
-sw $a2, 12($sp)
-sw $s0, 16($sp)
-sw $s1, 20($sp)
-sw $s2, 24($sp)
-sw $s3, 28($sp)
+#la $s2, tabuleiroPC
+#la $s3, copiaTabuleiroPC
+sw $s0, 36($sp)
+sw $s1, 40($sp)
+sw $a0, 44($sp)
+sw $a1, 48($sp)
+sw $a2, 52($sp)
+#sw $a0, 4($sp)
+#sw $a1, 8($sp)
+#sw $a2, 12($sp)
+#sw $s0, 16($sp)
+#sw $s1, 20($sp)
+#sw $s2, 24($sp)
+#sw $s3, 28($sp)
 add $t7, $0, $0
-addi $t9, $0, -1
+#addi $t9, $0, -1
+add $a0, $s1, $0
+add $a1, $s0, $0
 jal copiarTabuleiroCopia	# funcao que copia o tabuleiro utilizador para a copia Tabuleiro utilizador
+lw $a0, 44($sp)
+lw $a1, 48($sp)
+la $s1, copiaTabuleiroPC
+add $a0, $s1, $0
 jal zerarTabuleiroCopiaPC	# cria e inicializa a '-' a opia do tabuleiro do PC
-lw $a0, 4($sp)
-lw $a1, 8($sp)
-lw $a2, 12($sp)
+lw $a0, 44($sp)
+lw $s1, 40($sp)
+#lw $a0, 4($sp)
+#lw $a1, 8($sp)
+#lw $a2, 12($sp)
 cicloJogoPC:
+	addi $t9, $0, -1
 	jal displayTabuleiroBitMap	# funcao que da displçay ao tabuleiro no bitmap
 	jal displayTabuleiroJogoPC	# funcao que da display ao tabuleiro do jogo
-	lw $a0, 4($sp)			
-	lw $a1, 8($sp)
-	lw $a2, 12($sp)
+	lw $a0, 44($sp)			
+	lw $a1, 48($sp)
+	lw $a2, 52($sp)
 	validarVezJogada:
 	beq $t7, 2, vezPC		# if($t7 == 2) e o PC a jogar
 	vezUtilizador:
 	li $v0, 4			
 	la $a0, vezJogarUtilizador
 	syscall
-	lw $a1, 8($sp)			# recebe endereco barcos PC
+	lw $a0, 44($sp) 
+	lw $a1, 48($sp)			# recebe endereco barcos PC
 	li $v0, 12
 	syscall
-	add $t1, $v0, $0		# recebe coluna inserida pelo utilizador
+	add $s2, $v0, $0		# recebe coluna inserida pelo utilizador
 	li $v0, 5
 	syscall
-	add $t2, $v0, $0		# recebe linha inserida pelo utilizador
-	addi $t1, $t1, -97		# Passar de A -> 1, b -> 2 etc... (97 e o valor de A)
-	bge $t1, 10, vezUtilizador	# if(coluna > 10) esta fora fo tabuleiro volta a pedir ao utlizador as posicoes
-	bge $t2, 10, vezUtilizador	# if(linha > 10) esta fora fo tabuleiro volta a pedir ao utlizador as posicoes
-	mul $t1, $t1, 4			# multiplica coluna * 4 (colunas sao de 4 rm 4)
-	mul $t2, $t2, 40		# multiplica linha * 40 (linhas sao de 40 em 40)
-	add $t3, $t1, $t2		# soma linhas e coluna e recebe a posicao no array que o utilizador escolheu
-	bge $t3, 400, vezUtilizador	# if(pos do utilizador > 400) esta fora do array pede tudo de novo ao utilizador
+	add $s3, $v0, $0		# recebe linha inserida pelo utilizador
+	addi $s2, $s2, -97		# Passar de A -> 1, b -> 2 etc... (97 e o valor de A)
+	bge $s2, 10, vezUtilizador	# if(coluna > 10) esta fora fo tabuleiro volta a pedir ao utlizador as posicoes
+	bge $s3, 10, vezUtilizador	# if(linha > 10) esta fora fo tabuleiro volta a pedir ao utlizador as posicoes
+	mul $s2, $s2, 4			# multiplica coluna * 4 (colunas sao de 4 rm 4)
+	mul $s3, $s3, 40		# multiplica linha * 40 (linhas sao de 40 em 40)
+	add $s4, $s2, $s3		# soma linhas e coluna e recebe a posicao no array que o utilizador escolheu
+	bge $s4, 400, vezUtilizador	# if(pos do utilizador > 400) esta fora do array pede tudo de novo ao utilizador
 	
-	lw $s2, 24($sp)			# recebe endereco de tabuleiroPC
-	lw $s3, 28($sp)			# recebe endereco de copiaTabuleiroPC
-	add $s3, $s3, $t3		# avanca a copiaTabuleiroPC ate a posicao do utilizador
-	lw $t4, 0($s3)			# recebe o valor
-	bne $t4, '-', jogadaRepetidaUtilizador		# if($t4 != '-') esta posicaoja foi inserida anteriormente
-		add $s2, $s2, $t3			# avanca tabuleiroPC para a posicao do utilizador
-		lw $t4, 0($s2)				# recebe o valor
-		beq $t4, '-', aguaJogadaUtilizador	# if($t4 == '-') n tem barco
-		lw $a1, 8($sp)				# else{ recebe o endereco de barcosPC
+	#lw $s0, 36($sp)			# recebe endereco de tabuleiroPC
+	#lw $s1, 40($sp)			# recebe endereco de copiaTabuleiroPC
+	la $s0, tabuleiroPC
+	la $s1, copiaTabuleiroPC 
+	add $s1, $s1, $s4		# avanca a copiaTabuleiroPC ate a posicao do utilizador
+	lw $s5, 0($s1)			# recebe o valor
+	bne $s5, '-', jogadaRepetidaUtilizador		# if($s5 != '-') esta posicaoja foi inserida anteriormente
+		add $s0, $s0, $s4			# avanca tabuleiroPC para a posicao do utilizador
+		lw $s5, 0($s0)				# recebe o valor
+		beq $s5, '-', aguaJogadaUtilizador	# if($s5 == '-') n tem barco
+		lw $a1, 48($sp)				# else{ recebe o endereco de barcosPC
 		cicloVerArrayBarcoUtilizador:		
-			lw $t6, 0($a1)					
-			bne $t4, $t6, incrementar_a1_Utilizador		# if($t4 != $t6) o barco da pos atual do aaray n e o mesmo da pos do tabulerio ent vai incremenatr a0
+			lw $s7, 0($a1)					# recebe o numero do barco em $s7			
+			bne $s5, $s7, incrementar_a1_Utilizador		# if($s5 != $s7) o barco da pos atual do aaray n e o mesmo da pos do tabulerio ent vai incremenatr a0
 			
-			lw $t3, 4($a1)					# else{ recebe o tamanho do barco
-			lw $t6, 8($a1)					# recebe o contador de pecas destruidas do barco
-			addi $t6, $t6, 1				# incrementa 1 peca destruida	
-			sw $t6, 8($a1)					# guarda no array
-			la $t5, 'X'					
-			sw $t5, 0($s3)					# guarda 'X' no copiaTabuleiroPC na pos do utilziador
+			lw $s4, 4($a1)					# else{ recebe o tamanho do barco
+			lw $s7, 8($a1)					# recebe o contador de pecas destruidas do barco
+			addi $s7, $s7, 1				# incrementa 1 peca destruida	
+			sw $s7, 8($a1)					# guarda no array
+			la $s6, 'X'					
+			sw $s6, 0($s1)					# guarda 'X' no copiaTabuleiroPC na pos do utilziador
 			#jal displayTabuleiroJogoPC
-			bne $t3, $t6, acertouJogadaUtilizador		# if($t4 != $t6) barco n afundou
+			bne $s4, $s7, acertouJogadaUtilizador		# if($s5 != $s7) barco n afundou
 				li $v0, 4				# else{ escreve 'afundou' na consola
 				la $a0, JogadaAfundou
 				syscall
 			acertouJogadaUtilizador:
 			
-			div $t1, $t1, 4			# divide $t1 por 4 (para returnar ao valor original da coluna)
-			div $t2, $t2, 40		# divide $t2 por 40 (para returnar ao valor original da linha)
-			mul $t1, $t1, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
-			mul $t2, $t2, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
-			add $t1, $t1, 260		# adiciona 260 diferenca entre cada peca do tabuleiro do utilizador para o tabulerio do pc
+			div $s2, $s2, 4			# divide $s2 por 4 (para returnar ao valor original da coluna)
+			div $s3, $s3, 40		# divide $s3 por 40 (para returnar ao valor original da linha)
+			mul $s2, $s2, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
+			mul $s3, $s3, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
+			add $s2, $s2, 260		# adiciona 260 diferenca entre cada peca do tabuleiro do utilizador para o tabulerio do pc
 			#li $a0,20
-			add $a0, $0, $t1		# codigo para criar quadrado no bitmap
+			add $a0, $0, $s2		# codigo para criar quadrado no bitmap
 			li $a1,20	
 			#li $a2,20
-			add $a2, $0, $t2
+			add $a2, $0, $s3
 			li $a3,20
 			addi $t9, $0, 16711680		# Cor vermelho
 			jal rectangle
-		
-			lw $a0, 4($sp)
-			lw $a1, 8($sp)
-			lw $a2, 12($sp)
+			#lw $a0, 4($sp)
+			#lw $a1, 8($sp)
+			#lw $a2, 12($sp)
 			
 			li $v0, 4			# Escreve 'bomba' na consola
 			la $a0, JogadaBomba
 			syscall
+			lw $a0, 44($sp)
+			lw $a1, 48($sp)
+			lw $a2, 52($sp)
 			j chekarSeTodosBarcosAfundaramUtilizador
 			incrementar_a1_Utilizador:
 			addi $a1, $a1, 12 
 			j cicloVerArrayBarcoUtilizador
 		aguaJogadaUtilizador:
 		
-		div $t1, $t1, 4			# divide $t1 por 4 (para returnar ao valor original da coluna)
-		div $t2, $t2, 40		# divide $t2 por 40 (para returnar ao valor original da linha)
-		mul $t1, $t1, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
-		mul $t2, $t2, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
-		add $t1, $t1, 260		# adiciona 260 diferenca entre cada peca do tabuleiro do utilizador para o tabulerio do pc
+		div $s2, $s2, 4			# divide $s2 por 4 (para returnar ao valor original da coluna)
+		div $s3, $s3, 40		# divide $s3 por 40 (para returnar ao valor original da linha)
+		mul $s2, $s2, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
+		mul $s3, $s3, 25		# multiplica por 25 (diferenca de cada quadrado no bitmap)
+		add $s2, $s2, 260		# adiciona 260 diferenca entre cada peca do tabuleiro do utilizador para o tabulerio do pc
 		#li $a0,20
-		add $a0, $0, $t1		# codigo para criar quadrado no bitmap
+		add $a0, $0, $s2		# codigo para criar quadrado no bitmap
 		li $a1,20
 		#li $a2,20
-		add $a2, $0, $t2
+		add $a2, $0, $s3
 		li $a3,20
 		addi $t9, $0, 65535 		# Cor aqua
 		jal rectangle
 		
-		lw $a0, 4($sp)
-		lw $a1, 8($sp)
-		lw $a2, 12($sp)
+		#lw $a0, 4($sp)
+		#lw $a1, 8($sp)
+		#lw $a2, 12($sp)
 		
-		la $t5, '0'			# insere '0' no copiaTabuleiroPC
-		sw $t5, 0($s3)
+		la $s6, '0'			# insere '0' no copiaTabuleiroPC
+		sw $s6, 0($s1)
 		#jal displayTabuleiroJogoPC
 		li $v0, 4			# Escreve 'agua' na cosola
 		la $a0, JogadaAgua
 		syscall
-		
+		lw $a0, 44($sp)
+		lw $a1, 48($sp)
+		lw $a2, 52($sp)
 		addi $t7, $0, 2
 		j validarVezJogada
 		
 		chekarSeTodosBarcosAfundaramUtilizador:
-		lw $a1, 8($sp)
+		lw $a1, 48($sp)
 		ciclo_chekarSeTodosBarcosAfundaramUtilizador:
-		lw $t4, 0($a1)
-		lw $t5, 4($a1)
-		lw $t6, 8($a1)
-		bne $t5, $t6, vezUtilizador
-		bge $t4, 100, vitoriaUtilizador
+		lw $s5, 0($a1)
+		lw $s6, 4($a1)
+		lw $s7, 8($a1)
+		bne $s6, $s7, vezUtilizador
+		bge $s5, 100, vitoriaUtilizador
 		add $a1, $a1, 12
 		j ciclo_chekarSeTodosBarcosAfundaramUtilizador
 	jogadaRepetidaUtilizador:
@@ -838,56 +902,61 @@ cicloJogoPC:
 	li $v0, 4
 	la $a0, vezJogarPC
 	syscall
-	lw $a0, 4($sp)
+	#lw $a0, 4($sp)
+	lw $a0, 44($sp)			
+	#lw $a1, 48($sp)
 	#jal gerarNumeroRandom
 	jal gerarLinhaColunaRandom	# gera aleatoriamente uma coluna 0-10
-	add $t1, $v0, $0
+	add $s2, $v0, $0
 	jal gerarLinhaColunaRandom	# gera aleatoriamente uma linha 0-10
-	add $t2, $v0,$0
-	bge $t1, 10, vezPC
-	bge $t2, 10, vezPC
-	mul $t1, $t1, 4
-	mul $t2, $t2, 40
-	add $t3, $t1, $t2
-	bge $t3, 400, vezPC
+	add $s3, $v0,$0
+	bge $s2, 10, vezPC
+	bge $s3, 10, vezPC
+	mul $s2, $s2, 4
+	mul $s3, $s3, 40
+	add $s4, $s2, $s3
+	bge $s4, 400, vezPC
 	
-	lw $s0, 16($sp)
-	lw $s1, 20($sp)
-	add $s1, $s1, $t3
-	lw $t4, 0($s1)
-	beq $t4, '0', jogadaRepetidaPC
-	beq $t4, 'X', jogadaRepetidaPC
-		add $s0, $s0, $t3
-		lw $t4, 0($s0)
-		beq $t4, '-', aguaJogadaPC
-		lw $a0, 4($sp)
+	lw $s0, 36($sp)
+	lw $s1, 40($sp)
+	add $s1, $s1, $s4
+	lw $s5, 0($s1)
+	beq $s5, '0', jogadaRepetidaPC
+	beq $s5, 'X', jogadaRepetidaPC
+		add $s0, $s0, $s4
+		lw $s5, 0($s0)
+		beq $s5, '-', aguaJogadaPC
+		lw $a0, 44($sp)
 		cicloVerArrayBarcoPC:
-			lw $t6, 0($a0)
-			bne $t4, $t6, incrementar_a0_PC
-			lw $t3, 4($a0)
-			lw $t6, 8($a0)
-			addi $t6, $t6, 1
-			sw $t6, 8($a0)
-			la $t5, 'X'
-			sw $t5, 0($s1)
+			lw $s7, 0($a0)
+			bne $s5, $s7, incrementar_a0_PC
+			lw $s4, 4($a0)
+			lw $s7, 8($a0)
+			addi $s7, $s7, 1
+			sw $s7, 8($a0)
+			la $s6, 'X'
+			sw $s6, 0($s1)
 			#jal displayTabuleiroJogo
 			
-			div $t1, $t1, 4
-			div $t2, $t2, 40
-			mul $t1, $t1, 25
-			mul $t2, $t2, 25
+			div $s2, $s2, 4
+			div $s3, $s3, 40
+			mul $s2, $s2, 25
+			mul $s3, $s3, 25
 			#li $a0,20
-			add $a0, $0, $t1
+			add $a0, $0, $s2
 			li $a1,20
 			#li $a2,20
-			add $a2, $0, $t2
+			add $a2, $0, $s3
 			li $a3,20
 			addi $t9, $0, 16711680		# Cor vermelho
 			jal rectangle
+			lw $a0, 44($sp)
+			lw $a1, 48($sp)
+			lw $a2, 52($sp)
 		
-			lw $a0, 4($sp)
-			lw $a1, 8($sp)
-			lw $a2, 12($sp)
+			#lw $a0, 4($sp)
+			#lw $a1, 8($sp)
+			#lw $a2, 12($sp)
 			
 			j chekarSeTodosBarcosAfundaramPC
 			incrementar_a0_PC:
@@ -895,99 +964,111 @@ cicloJogoPC:
 			j cicloVerArrayBarcoPC
 		aguaJogadaPC:
 		
-		div $t1, $t1, 4
-		div $t2, $t2, 40
-		mul $t1, $t1, 25
-		mul $t2, $t2, 25
+		div $s2, $s2, 4
+		div $s3, $s3, 40
+		mul $s2, $s2, 25
+		mul $s3, $s3, 25
 		#li $a0,20
-		add $a0, $0, $t1
+		add $a0, $0, $s2
 		li $a1,20
 		#li $a2,20
-		add $a2, $0, $t2
+		add $a2, $0, $s3
 		li $a3,20
 		addi $t9, $0, 65535 	# Cor aqua
 		jal rectangle
 		
-		lw $a0, 4($sp)
-		lw $a1, 8($sp)
-		lw $a2, 12($sp)
+		lw $a0, 44($sp)
+		lw $a1, 48($sp)
+		lw $a2, 52($sp)
 		
-		la $t5, '0'
-		sw $t5, 0($s1)
+		#lw $a0, 4($sp)
+		#lw $a1, 8($sp)
+		#lw $a2, 12($sp)
+		
+		la $s6, '0'
+		sw $s6, 0($s1)
 		#jal displayTabuleiroJogo
 		addi $t7, $0, 1
 		j validarVezJogada
 		
 		chekarSeTodosBarcosAfundaramPC:
-		lw $a0, 4($sp)
+		lw $a0, 44($sp)
 		ciclo_chekarSeTodosBarcosAfundaramPC:
-		lw $t4, 0($a0)
-		lw $t5, 4($a0)
-		lw $t6, 8($a0)
-		bne $t5, $t6, vezPC
-		bge $t4, 100, vitoriaPC
+		lw $s5, 0($a0)
+		lw $s6, 4($a0)
+		lw $s7, 8($a0)
+		bne $s6, $s7, vezPC
+		bge $s5, 100, vitoriaPC
 		add $a0, $a0, 12
 		j ciclo_chekarSeTodosBarcosAfundaramPC
 	jogadaRepetidaPC:
 	j vezPC
 j cicloJogoPC
 vitoriaUtilizador:
-lw $a0, 4($sp)
-lw $a1, 8($sp)
-lw $a2, 12($sp)
-lw $t5, 0($a2)			# recbe pontuacao do utilizador
-addi $t4, $t5, 5		# adiciona 5
-sw $t4, 0($a2)			# guarda
-lw $t5, 4($a2)			# recbe pontuacao do PC
-addi $t4, $t5, -3		# decrementa -3
-blt $t4, 0, igualarDerrotaPC0	# if($t4 < 0) vai igualar $t4 = 0 pois n existem pontuacoes negativas
-sw $t4, 4($a2)			# guarda
+#lw $a0, 4($sp)
+#lw $a1, 8($sp)
+#lw $a2, 12($sp)
+lw $s6, 0($a2)			# recbe pontuacao do utilizador
+addi $s5, $s6, 5		# adiciona 5
+sw $s5, 0($a2)			# guarda
+lw $s6, 4($a2)			# recbe pontuacao do PC
+addi $s5, $s6, -3		# decrementa -3
+blt $s5, 0, igualarDerrotaPC0	# if($s5 < 0) vai igualar $s5 = 0 pois n existem pontuacoes negativas
+sw $s5, 4($a2)			# guarda
 j sairJogoPC
 igualarDerrotaPC0:
-add $t4, $0, $0			# iguala $t4 = 0
-sw $t4, 4($a2)			# guarda
+add $s5, $0, $0			# iguala $s5 = 0
+sw $s5, 4($a2)			# guarda
 j sairJogoPC
 vitoriaPC:
-lw $a0, 4($sp)
-lw $a1, 8($sp)
-lw $a2, 12($sp)
-lw $t5, 4($a2)
-addi $t4, $t5, 5
-sw $t4, 4($a2)
-lw $t5, 0($a2)
-addi $t4, $t5, -3
-blt $t4, 0, igualarDerrotaUtilizador0
-sw $t4, 0($a2)
+#lw $a0, 4($sp)
+#lw $a1, 8($sp)
+#lw $a2, 12($sp)
+lw $s6, 4($a2)
+addi $s5, $s6, 5
+sw $s5, 4($a2)
+lw $s6, 0($a2)
+addi $s5, $s6, -3
+blt $s5, 0, igualarDerrotaUtilizador0
+sw $s5, 0($a2)
 j sairJogoPC
 igualarDerrotaUtilizador0:
-add $t4, $0, $0
-sw $t4, 0($a2)
+add $s5, $0, $0
+sw $s5, 0($a2)
 j sairJogoPC
 sairJogoPC:
 zerarArrayBarcosPC:
-lw $a0, 4($sp)
+lw $a0, 44($sp)
 ciclo_zerarArrayBarcosPC:
-lw $t4, 0($a0)
-bge $t4, 100, zerarArrayBarcosUtilizador
-add $t4, $0, $0
-sw $t4, 0($a0)
-add $a0, $a0, 12
+lw $s5, 0($a0)
+bge $s5, 100, zerarArrayBarcosUtilizador
+add $s5, $0, $0
+sw $s5, 0($a0)
+add $a0, $a0, 4
 j ciclo_zerarArrayBarcosPC
 zerarArrayBarcosUtilizador:
-lw $a1, 4($sp)
+lw $a1, 48($sp)
 ciclo_zerarArrayBarcosUtilizador:
-lw $t4, 0($a1)
-bge $t4, 100, sairJogoDepoisDeZerarPC
-add $t4, $0, $0
-sw $t4, 0($a1)
-add $a1, $a1, 12
+lw $s5, 0($a1)
+bge $s5, 100, sairJogoDepoisDeZerarPC
+add $s5, $0, $0
+sw $s5, 0($a1)
+add $a1, $a1, 4
 j ciclo_zerarArrayBarcosUtilizador
 sairJogoDepoisDeZerarPC:
-add $t4, $0, $0
-sw $t4, 0($a0)
-sw $t4, 0($a1)
+add $s5, $0, $0
+sw $s5, 0($a0)
+sw $s5, 0($a1)
 lw $ra, 0($sp)
-add $sp, $sp, 32
+lw $s0, 4($sp)
+lw $s1, 8($sp)
+lw $s2, 12($sp)
+lw $s3, 16($sp)
+lw $s4, 20($sp)
+lw $s5, 24($sp)
+lw $s6, 28($sp)
+lw $s7, 32($sp)
+add $sp, $sp, 56
 jr $ra
 
 
@@ -998,8 +1079,11 @@ copiarTabuleiroCopia:
 # a1 -> tabuleiro
 #t1 -> i
 #t2 -> valor da pos de $a1
-add $a0, $s1, $0
-add $a1, $s0, $0
+addi $sp, $sp, -8
+sw $a0, 0($sp)
+sw $a1, 4($sp)
+#add $a0, $s1, $0
+#add $a1, $s0, $0
 add $t1, $0, $0
 copiar_tabuleiroCopia_for:
 	lw $t2, 0($a1)		# recebo o valor do tabuleiro
@@ -1010,6 +1094,9 @@ copiar_tabuleiroCopia_for:
 	addi $t1, $t1, 1
 	j copiar_tabuleiroCopia_for
 sair_copiar_tabuleiroCopia_for:
+lw $a0, 0($sp)
+lw $a1, 4($sp)
+addi $sp, $sp, 8
 jr $ra
 
 
@@ -1018,7 +1105,9 @@ zerarTabuleiroCopiaPC:
 # a0 -> copiaTabuleiroPC
 #t1 -> i
 #t2 -> '-'
-add $a0, $s3, $0
+addi $sp, $sp, -4
+sw $a0, 0($sp)
+#add $a0, $s3, $0
 add $t1, $0, $0
 li $t2, '-'
 zerar_tabuleiroCopiaPC_for:
@@ -1028,6 +1117,8 @@ zerar_tabuleiroCopiaPC_for:
 	addi $t1, $t1, 1
 	j zerar_tabuleiroCopiaPC_for
 sair_zerar_tabuleiroCopiaPC_for:
+lw $a0, 0($sp)
+addi $sp, $sp, 4
 jr $ra
 
 
@@ -1040,29 +1131,40 @@ displayTabuleiroBitMap:
 #t4 -> val do endere?o
 #t6 -> axis Y
 #t9 -> cor
-add $sp, $sp, -12
+addi $sp, $sp, -48
 sw $ra, 0($sp)
-la $s0, copiaTabuleiroPC
-la $s1, copiaTabuleiro
 sw $s0, 4($sp)
 sw $s1, 8($sp)
-addi $t5, $0, 0
-add $t7, $0, $0
-addi $t6, $0, 0
+sw $s2, 12($sp)
+sw $s3, 16($sp)
+sw $s4, 20($sp)
+sw $s5, 24($sp)
+sw $s6, 28($sp)
+sw $a0, 32($sp)
+sw $a1, 36($sp)
+sw $a2, 40($sp)
+sw $a3, 44($sp)
+la $s0, copiaTabuleiroPC
+la $s1, copiaTabuleiro
+#sw $s0, 4($sp)
+#sw $s1, 8($sp)
+addi $s4, $0, 0
+add $s2, $0, $0
+addi $s6, $0, 0
 addi $t9, $0, -1
 displayTabuleiroBitMap_1for:
-	bge $t7, 10, sair_displayTabuleiroBitMap_1for		# i >= 10 sai do ciclo
-	add $t8, $0, $0
+	bge $s2, 10, sair_displayTabuleiroBitMap_1for		# i >= 10 sai do ciclo
+	add $s3, $0, $0
 	displayTabuleiroBitMap_2for:
-		bge $t8, 10, sair_displayTabuleiroBitMap_2for		# j >= 10 sai do ciclo
-		lw $t4, 0($s1)		# recebo o valor do copiaTabuleiro
+		bge $s3, 10, sair_displayTabuleiroBitMap_2for		# j >= 10 sai do ciclo
+		lw $s5, 0($s1)		# recebo o valor do copiaTabuleiro
 
 		# codigo do quadrado no bitmap
-		add $a0, $0, $t5		# adicono a $ao o valor da pos de X
+		add $a0, $0, $s4		# adicono a $ao o valor da pos de X
 		li $a1,20
-		add $a2, $0, $t6		# adicono a $ao o valor da pos de Y	
+		add $a2, $0, $s6		# adicono a $ao o valor da pos de Y	
 		li $a3,20
-		bne $t4, '-', bitMapComBarco	# if(valor do tabulerio != '-') e um barco
+		bne $s5, '-', bitMapComBarco	# if(valor do tabulerio != '-') e um barco
 		jal rectangle			# else cria um quadrado branco
 		j bitMapPc
 		bitMapComBarco:
@@ -1072,40 +1174,52 @@ displayTabuleiroBitMap_1for:
 		j bitMapPc
 
 		bitMapPc:
-		add $t5, $t5, 260		# adicono a $t5 + 260 (260 e a diferenca entra os quadrados Utilizador apara os do PC)
-		lw $t4, 0($s0)
+		add $s4, $s4, 260		# adicono a $s4 + 260 (260 e a diferenca entra os quadrados Utilizador apara os do PC)
+		lw $s5, 0($s0)
 
 		# codigo do quadrado no bitmap
-		add $a0, $0, $t5		# adicono a $ao o valor da pos de X
+		add $a0, $0, $s4		# adicono a $ao o valor da pos de X
 		li $a1,20
-		add $a2, $0, $t6		# adicono a $ao o valor da pos de Y	
+		add $a2, $0, $s6		# adicono a $ao o valor da pos de Y	
 		li $a3,20
-		add $t5, $t5, -260		# volto $t5 ao valor do quandrado do utilizador
+		add $s4, $s4, -260		# volto $s4 ao valor do quandrado do utilizador
 		jal rectangle
 		
 		addi $s0, $s0, 4
 		addi $s1, $s1, 4
-		add $t5, $t5, 25	# incremento $t5 + 25 ( 25 e a diferenca entre cada quadrado no axis X)
-		addi $t8, $t8, 1
+		add $s4, $s4, 25	# incremento $s4 + 25 ( 25 e a diferenca entre cada quadrado no axis X)
+		addi $s3, $s3, 1
 		j displayTabuleiroBitMap_2for
 	sair_displayTabuleiroBitMap_2for:
-	addi $t5, $0, 0		# igualo $t5 = 0 para voltar a primeira coluna 
-	add $t6, $t6, 25	# incremento $t6 + 25 ( 25 e a diferenca entre cada quadrado no axis Y)
-	addi $t7, $t7, 1
+	addi $s4, $0, 0		# igualo $s4 = 0 para voltar a primeira coluna 
+	add $s6, $s6, 25	# incremento $s6 + 25 ( 25 e a diferenca entre cada quadrado no axis Y)
+	addi $s2, $s2, 1
 	j displayTabuleiroBitMap_1for
 sair_displayTabuleiroBitMap_1for:
 lw $ra, 0($sp)
-add $sp, $sp, 12
+lw $s0, 4($sp)
+lw $s1, 8($sp)
+lw $s2, 12($sp)
+lw $s3, 16($sp)
+lw $s4, 20($sp)
+lw $s5, 24($sp)
+lw $s6, 28($sp)
+lw $a0, 32($sp)
+lw $a1, 36($sp)
+lw $a2, 40($sp)
+lw $a3, 44($sp)
+addi $sp, $sp, 48
 jr $ra
 
 
 displayTabuleiroJogoPC:
-#a0 -> copiaTabuleiroPC
+#t0 -> copiaTabuleiroPC
 #t1 -> i
 #t2 -> j
 #t4 -> val do endere?o
-add $sp, $sp -4
-add $a0, $s3, $0
+addi $sp, $sp -4
+#add $a0, $s3, $0
+la $t0, copiaTabuleiroPC
 sw $a0, 0($sp)
 add $t1, $0, $0
 displayTabuleiroJogoPC_1for:
@@ -1114,27 +1228,28 @@ displayTabuleiroJogoPC_1for:
 	displayTabuleiroJogoPC_2for:
 		bge $t2, 10, sair_displayTabuleiroJogoPC_2for		# j >= 10 sai do ciclo
 		li $v0, 4
-		lw $t4, 0($a0)			# recebo o valor do copiaTabuleiroPC
+		lw $t4, 0($t0)			# recebo o valor do copiaTabuleiroPC
 		sw $t4, valCopiaTabuleiro	# guardo o valor num array auxiliar para usar o seu endereco para escrever o valor na consola (como String)
 		la $a0, valCopiaTabuleiro	# guardo o endereco do array auxiliar em a0 para escrever o seu valor na consola (como String)
 		syscall
-		lw $a0, 0($sp)
-		addi $a0, $a0, 4
-		sw $a0, 0($sp)
+		#lw $a0, 0($sp)
+		addi $t0, $t0, 4
+		#sw $a0, 0($sp)
 		addi $t2, $t2, 1
 		j displayTabuleiroJogoPC_2for
 	sair_displayTabuleiroJogoPC_2for:
 	li $v0, 4
 	la $a0, Enter
 	syscall
-	lw $a0, 0($sp)
+	#lw $a0, 0($sp)
 	addi $t1, $t1, 1
 	j displayTabuleiroJogoPC_1for
 sair_displayTabuleiroJogoPC_1for:
 li $v0, 4
 la $a0, Enter
 syscall
-add $sp, $sp, 4
+lw $a0, 0($sp)
+addi $sp, $sp, 4
 jr $ra
 
 
@@ -1196,10 +1311,10 @@ displayTabuleiroJogo:
 #t4 -> val do endere?o
 # $t5 -> valor da posicao do array tabuleiro
 
-addi $sp, $sp, -8
-sw $a0, 4($sp)
+addi $sp, $sp, -4
+sw $a0, 0($sp)
 la $t0, copiaTabuleiro
-sw $t0, 0($sp)
+#sw $t0, 0($sp)
 add $t1, $0, $0
 displayTabuleiroJogo_1for:
 	bge $t1, 10, sair_displayTabuleiroJogo_1for		# i >= 10 sai do ciclo
@@ -1213,32 +1328,32 @@ displayTabuleiroJogo_1for:
 		li $v0, 1
 		move $a0, $t4				# else{ e inteiro movo o valor para $a0 e escrevo na consola
 		syscall
-		lw $t0, 0($sp)
+		#lw $t0, 0($sp)
 		j incrementarS0
 		printStringJogo:
 		li $v0, 4
 		sw $t4, valCopiaTabuleiro		# guardo o valor num arrray auxiliar para depois escrever como string
 		la $a0, valCopiaTabuleiro		# $a0 recebe o endereco desse array auxiliar e escrever o seu valor na consola
 		syscall
-		lw $t0, 0($sp)
+		#lw $t0, 0($sp)
 		incrementarS0:
 		addi $t0, $t0, 4
-		sw $t0, 0($sp)
+		#sw $t0, 0($sp)
 		addi $t2, $t2, 1
 		j displayTabuleiroJogo_2for
 	sair_displayTabuleiroJogo_2for:
 	li $v0, 4
 	la $a0, Enter
 	syscall
-	lw $t0, 0($sp)
+	#lw $t0, 0($sp)
 	addi $t1, $t1, 1
 	j displayTabuleiroJogo_1for
 sair_displayTabuleiroJogo_1for:
 li $v0, 4
 la $a0, Enter
 syscall
-lw $a0, 4($sp)
-addi $sp, $sp, 8
+lw $a0, 0($sp)
+addi $sp, $sp, 4
 jr $ra
 
 zerarTabuleiroCopia:
@@ -1625,7 +1740,7 @@ addBarcoArrayBarcos:
 	addi $a2, $a2, 4
 	sw $0, 0($a2)
 	addi $a2, $a2, 4
-	addi $s7, $0, 100	# Usar $s7 para meter -1 valor que vai ser usado como fim do array dos barcos
+	addi $s7, $0, 100	# Usar $s7 para meter 100 valor que vai ser usado como fim do array dos barcos
 	sw $s7, 0($a2)		# Numero 0 no fim do array usado depois para valida??es noutras fun??es ex: jogo (para saber o fim do array dos barcos)
 sairGerarBarco:
 addi $v0, $a1, 1
@@ -1839,11 +1954,17 @@ jr $ra
 
 
 gerarLinhaColunaRandom:
+addi $sp, $sp, -8
+sw $a0, 0($sp)
+sw $a1, 4($sp)
 li $a1, 10	#valor maximo do numero aleatorio
 li $v0, 42	#gerar numero aleatorio
 syscall
 add $a0, $a0, 0 #valor minimo do numero aleatorio
 add $v0, $a0, $0
+lw $a0, 0($sp)
+lw $a1, 4($sp)
+addi $sp, $sp, 8
 jr $ra
 
 gerarNumeroRandom:
@@ -2044,6 +2165,11 @@ rectangle:
 # $a1 is width (must be nonnegative and within the display)
 # $a2 is ymin  (i.e., top edge, increasing down; must be within the display)
 # $a3 is height (must be nonnegative and within the display)
+	addi $sp, $sp, -16
+	sw $a0, 0($sp)
+	sw $a1, 4($sp)
+	sw $a2, 8($sp)
+	sw $a3, 12($sp)
 
 	beq $a1,$zero,rectangleReturn 	# zero width: draw nothing
 	beq $a3,$zero,rectangleReturn 	# zero height: draw nothing
@@ -2077,4 +2203,9 @@ rectangleXloop:
 	bne $a2,$a3,rectangleYloop 	# keep going if not off the bottom of the rectangle
 
 rectangleReturn:
+	lw $a0, 0($sp)
+	lw $a1, 4($sp)
+	lw $a2, 8($sp)
+	lw $a3, 12($sp)	
+	addi $sp, $sp, 16
 	jr $ra
