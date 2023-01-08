@@ -580,6 +580,7 @@ cicloJogo:
 	li $v0, 4			# Escreve que a posicao ja foi inserida anteriormente e pede ao utilizador para inserir outra
 	la $a0, JogadaRepetida
 	syscall
+	lw $a0, 32($sp)
 	j posUtilizador
 j cicloJogo
 sairJogo:
