@@ -433,10 +433,10 @@ add $a0, $s0, $0
 jal displayTabuleiro		# chama funcao de display do tabuleiro
 
 #Descomentar para aparecer o tabuleiro do PC na consola
-#lw $s0, 8($sp)			# recebe o endereco do tabuleiro do PC
-#la $s0, tabuleiroPC
-#add $a0, $s0, $0
-#jal displayTabuleiro
+lw $s0, 8($sp)			# recebe o endereco do tabuleiro do PC
+la $s0, tabuleiroPC
+add $a0, $s0, $0
+jal displayTabuleiro
 
 la $s1, barcos
 la $s3, barcosPC
@@ -510,7 +510,7 @@ lw $a0, 32($sp)
 cicloJogo:
 	jal displayTabuleiroJogo	# chama funcao de display do tabuleiro do jogo (copiaTabuleiro)
 	posUtilizador:
-	lw $a1, 32($sp)
+	lw $a0, 32($sp)
 	lw $a1, 36($sp)
 	li $v0, 12			# le carater do teclado (linha do tabuleiro)
 	syscall
@@ -534,7 +534,7 @@ cicloJogo:
 		lw $s4, 0($a1)				# recebe o valor em $s4
 		beq $s4, '-', aguaJogada		# if($s4 == '-') nao havia barco nessa posicao ent e agua
 		cicloVerArrayBarco:
-			lw $s6, 0($a0)				# recebe o valor do endereco de barcos	
+			lw $s6, 0($a0)				# recebe o numero do barco	
 			bne $s4, $s6, incrementar_a0		# if(barco da posicao utilizador != barco do array) continua a avancar no array ate encontrar o barco certo
 			lw $s3, 4($a0)				# se os barcos sao iguais, recebe o tamanho do barco do array de barcos
 			lw $s6, 8($a0)				# recebe o contador de quantas pecas desse barco foram destruidas
@@ -1267,14 +1267,12 @@ gerarPos:
 		lw $a0, 36($sp)
 		add $s1, $v0, $0		# Guarda a primeira posi??op gerada pela fun??o "gerarNumeroRandom"
 
-		add $v0, $s5, $0
 		add $a0, $s1, $0
 		jal validarCima			# Chama fun??o que vai validar se vou precisar validar a linha de cima
 		lw $a0, 36($sp)
 		add $s5, $v0, $0		# recebe o valor da fun??o
 		j sairValidarCimaBaixo		# se $s5 = 1 ent?o estou na primeira linha e n?o preciso de fazer "validarLinhaBaixo"
 		
-		add $v0, $s5, $0
 		add $a0, $s1, $0
 		jal validarBaixo
 		lw $a0, 36($sp)
@@ -1429,7 +1427,7 @@ gerarPos:
 	sairTeste:
 	addi $s7, $0, 0			# i = 0
 	forSizeBarco:
-		beq $s7, $a0, breakForSizeBarco	# If(I < Size) SAI -> breakForSizeBarco
+		beq $s7, $a0, breakForSizeBarco	# If(I == Size) SAI -> breakForSizeBarco
 		lw $s2, 0($a3)			# Recebe o valor dessa posi??o em $s2
 		bne $s2, '-', gerarPos	
 		beq $s3, 0, fazHorizontal	# If($s3 == 0) ($s2 = 0 -> Horizontal / $s2 = 1 -> Vertical)
@@ -1548,7 +1546,7 @@ gerarPos:
 breakForSizeBarco:
 addi $s7, $0 0		# I = 0
 forAddBarco:
-	beq $s7, $a0, addBarcoArrayBarcos	# If(I < Size) SAI -> breakForSizeBarco
+	beq $s7, $a0, addBarcoArrayBarcos	# If(I == Size) SAI -> breakForSizeBarco
 	addi $s0, $s0, -4			# Baixa as posi??es do vetor de $s0(posi??es das pe?as do barco)
 	lw $s1, 0($s0)				# Recebe o valor de $s0(posi??es do tabuleiro) para $s1	
 	lw $a3, 40($sp)
